@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 15% 97%;
+    --foreground: 222 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 4.9%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 94%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 194 74% 56%;
+    --accent-foreground: 222 84% 4.9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+
+    /* Risk level colors - more vibrant */
+    --risk-low: 142 76% 36%;
+    --risk-low-bg: 138 76% 97%;
+    --risk-moderate: 32 95% 44%;
+    --risk-moderate-bg: 48 100% 96%;
+    --risk-high: 0 84% 60%;
+    --risk-high-bg: 0 93% 94%;
+
+    /* Beautiful accent colors */
+    --pastel-blue: 199 89% 48%;
+    --pastel-green: 158 64% 52%;
+    --pastel-purple: 262 83% 58%;
+    --pastel-pink: 336 84% 57%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(220, 60%, 72%), hsl(158, 45%, 65%));    /* Slate blue to eucalyptus green */
+    --gradient-secondary: linear-gradient(135deg, hsl(42, 70%, 85%), hsl(48, 60%, 75%));     /* Amber cream to light honey */
+    --gradient-accent: linear-gradient(135deg, hsl(340, 65%, 80%), hsl(210, 55%, 75%));      /* Coral rose to steel blue */
+        
+    /* Modern shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(221 83% 53% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(221 83% 53% / 0.1), 0 2px 4px -1px hsl(221 83% 53% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(221 83% 53% / 0.1), 0 4px 6px -2px hsl(221 83% 53% / 0.05);
+    --shadow-xl: 0 20px 25px -5px hsl(221 83% 53% / 0.1), 0 10px 10px -5px hsl(221 83% 53% / 0.04);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 220 15% 97%;
+    --sidebar-foreground: 222 84% 4.9%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 40% 94%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 221 83% 53%;
+  }
+
+  .dark {
+    --background: 222 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 28% 17%;
+    --muted-foreground: 217 11% 65%;
+
+    --accent: 194 74% 56%;
+    --accent-foreground: 222 84% 4.9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 221 83% 53%;
+    
+    /* Dark mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(222, 55%, 45%), hsl(158, 40%, 35%));    /* Indigo blue to muted green */
+    --gradient-secondary: linear-gradient(135deg, hsl(230, 15%, 25%), hsl(216, 15%, 20%));   /* Charcoal purple to deep gray */
+    --gradient-accent: linear-gradient(135deg, hsl(340, 60%, 55%), hsl(210, 60%, 50%));      /* Dusty pink to ocean blue */
+       
+    --sidebar-background: 224 71% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 215 28% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 221 83% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
