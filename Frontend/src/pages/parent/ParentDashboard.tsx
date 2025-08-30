@@ -98,15 +98,15 @@ export default function ParentDashboard() {
             Add Child
           </Button>
           
-          <Button variant="outline" onClick={handleManageStimuli}>
+          {/* <Button variant="outline" onClick={handleManageStimuli}>
             <Video className="h-4 w-4 mr-2" />
             Manage Video Stimuli
-          </Button>
+          </Button> */}
           
-          <Button variant="outline" onClick={handleScheduleAssessment}>
+          {/* <Button variant="outline" onClick={handleScheduleAssessment}>
             <Calendar className="h-4 w-4 mr-2" />
             Schedule Assessment
-          </Button>
+          </Button> */}
 
           <Button variant="outline" onClick={handleRefreshChildren} disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
