@@ -1,0 +1,12 @@
+{
+    "child_id": "3",
+    "stimulus_id": "1",
+    "session_type": "default",
+    "predicted_class": "Non-ASD",
+    "risk_level": "High",
+    "confidence": 1.0,
+    "scanpath_path": "results\\3\\20250824_201336\\scanpath.png",
+    "heatmap_path": "results\\3\\20250824_201336\\heatmap.png",
+    "gaze_data_path": "results\\3\\20250824_201336\\gaze_data.xlsx",
+    "timestamp": "20250824_201406"
+}

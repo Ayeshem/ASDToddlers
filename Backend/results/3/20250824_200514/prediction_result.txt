@@ -1,0 +1,11 @@
+ASD Prediction Result
+=====================
+Timestamp       : 20250824_200547
+Child_ID        : 3
+Stimulus_ID     : 1
+Heatmap Image   : results\3\20250824_200514\heatmap.png
+Session_Type    : default
+Scanpath Image  : results\3\20250824_200514\scanpath.png
+Predicted Class : Non-ASD
+Risk Level      : High
+Confidence      : 1.000000
