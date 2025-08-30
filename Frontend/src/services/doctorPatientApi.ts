@@ -154,9 +154,9 @@ class DoctorPatientApi {
       );
 
       return patientsWithReports
-        .filter((result): result is PromiseFulfilledResult<Child & { latestReport?: Report }> => 
-          result.status === 'fulfilled')
-        .map(result => result.value);
+      .filter((result) => result.status === 'fulfilled')
+      .map((result) => (result as PromiseFulfilledResult<Child & { latestReport?: Report }>).value);
+    
     } catch (error) {
       console.error('Failed to get all patients with reports:', error);
       throw error;
