@@ -346,7 +346,7 @@ class AdminApi {
   // =============================================================================
 
   // Map risk level from API to frontend format
-  mapRiskLevel(apiRiskLevel: string): 'low' | 'moderate' | 'high' {
+  mapRiskLevel(apiRiskLevel: string): 'safe' | 'low' | 'moderate' | 'high' {
     switch (apiRiskLevel.toLowerCase()) {
       case 'safe': return 'safe';      // ✅ added
       case 'low': return 'low';
