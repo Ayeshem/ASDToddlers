@@ -54,7 +54,7 @@ export const useAuthStore = create<AuthState>()(
           
           if (response.message === 'Login successful') {
             const user: User = {
-              id: response.user?.id || email, // Use email as consistent ID
+              id: email, // Use email as consistent ID
               email: email,
               name: response.user?.full_name || email,
               role: response.user?.role as UserRole || role,
@@ -119,7 +119,7 @@ export const useAuthStore = create<AuthState>()(
           
           if (response.message === 'User registered successfully') {
             const user: User = {
-              id: response.user?.id || email, // Use email as consistent ID
+              id: email, // Use email as consistent ID
               email: email,
               name: name,
               role: role,
@@ -173,7 +173,7 @@ export const useAuthStore = create<AuthState>()(
             const role = validRoles.includes(user.role as UserRole) ? user.role as UserRole : 'parent';
             
             const userData: User = {
-              id: user.id.toString(),
+              id: user.email,
               email: user.email,
               name: user.full_name,
               role: role,
