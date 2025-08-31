@@ -17,6 +17,7 @@ import {
   TrendingUp,
   AlertTriangle,
   CheckCircle,
+  ShieldCheck,   // ✅ added
   Users,
   BarChart3,
   Eye,
@@ -86,6 +87,7 @@ export function AssessmentResultModal({ result, isOpen, onClose }: AssessmentRes
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
+      case 'safe': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
       case 'low': return 'text-green-600 bg-green-50 border-green-200';
       case 'moderate': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'high': return 'text-red-600 bg-red-50 border-red-200';
@@ -95,6 +97,7 @@ export function AssessmentResultModal({ result, isOpen, onClose }: AssessmentRes
 
   const getRiskIcon = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
+      case 'safe': return <ShieldCheck className="h-4 w-4" />;
       case 'low': return <CheckCircle className="h-4 w-4" />;
       case 'moderate': return <AlertTriangle className="h-4 w-4" />;
       case 'high': return <AlertTriangle className="h-4 w-4" />;
@@ -175,6 +178,7 @@ export function AssessmentResultModal({ result, isOpen, onClose }: AssessmentRes
                         Risk Level: {result.risk_level}
                       </div>
                       <div className="text-sm opacity-80">
+                        {result.risk_level.toLowerCase() === 'safe' && 'No immediate concerns detected. Continue regular monitoring and healthy practices.'}
                         {result.risk_level.toLowerCase() === 'low' && 'Low probability of ASD. Continue regular monitoring.'}
                         {result.risk_level.toLowerCase() === 'moderate' && 'Moderate probability of ASD. Consider additional evaluation.'}
                         {result.risk_level.toLowerCase() === 'high' && 'High probability of ASD. Recommend immediate professional evaluation.'}
@@ -386,6 +390,13 @@ export function AssessmentResultModal({ result, isOpen, onClose }: AssessmentRes
                       <div className="p-4 bg-gray-50 rounded-lg">
                         <h4 className="font-semibold text-gray-900 mb-2">Next Steps</h4>
                         <div className="space-y-2 text-gray-700">
+                        {result.risk_level.toLowerCase() === 'safe' && (
+                            <>
+                              <p>• No concerns detected at this stage</p>
+                              <p>• Maintain healthy daily routines and environment</p>
+                              <p>• Continue regular monitoring as a precaution</p>
+                            </>
+                          )}
                           {result.risk_level.toLowerCase() === 'low' && (
                             <>
                               <p>• Continue regular developmental monitoring</p>

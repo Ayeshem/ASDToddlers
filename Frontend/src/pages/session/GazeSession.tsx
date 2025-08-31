@@ -275,7 +275,12 @@ export default function GazeSession() {
                 <span>Processing</span>
               </div>
             )}
-            
+            {isRecording && !backendProcessing && (
+              <div className="flex items-center gap-1 text-sm text-safe">
+                <div className="w-2 h-2 bg-safe rounded-full animate-pulse" />
+                <span>Safe Mode</span>
+              </div>
+            )}
             {isRecording && !backendProcessing && (
               <div className="flex items-center gap-1 text-sm text-risk-moderate">
                 <AlertCircle className="h-4 w-4" />
@@ -427,6 +432,10 @@ export default function GazeSession() {
                     <div>
                       <p className="text-muted-foreground">Quality</p>
                       <p className="text-lg font-semibold text-risk-low">Good</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Quality</p>
+                      <p className="text-lg font-semibold text-safe">Safe</p>
                     </div>
                   </div>
                 </div>

@@ -29,6 +29,7 @@ export interface SystemStats {
   totalChildren: number;
   totalAssessments: number;
   totalStimuli: number;
+  safeRiskCount: number;
   lowRiskCount: number;
   moderateRiskCount: number;
   highRiskCount: number;
@@ -83,6 +84,7 @@ class AdminApi {
       const [
         childrenCount,
         doctorCount,
+        safeRisk,
         lowRisk,
         moderateRisk,
         highRisk,
@@ -90,6 +92,7 @@ class AdminApi {
       ] = await Promise.allSettled([
         this.request<{ total_children: number }>('/children/count'),
         this.request<{ total_doctors: number }>('/doctors-count'),
+        this.request<{ count: number }>('/count-safe-risk'),   // ✅ safe
         this.request<{ count: number }>('/count-low-risk'),
         this.request<{ count: number }>('/count-moderate-risk'),
         this.request<{ count: number }>('/count-high-risk'),
@@ -98,12 +101,13 @@ class AdminApi {
 
       const totalChildren = childrenCount.status === 'fulfilled' ? childrenCount.value.total_children : 0;
       const totalDoctors = doctorCount.status === 'fulfilled' ? doctorCount.value.total_doctors : 0;
+      const safeRiskCount = safeRisk.status === 'fulfilled' ? safeRisk.value.count : 0;   // ✅ safe
       const lowRiskCount = lowRisk.status === 'fulfilled' ? lowRisk.value.count : 0;
       const moderateRiskCount = moderateRisk.status === 'fulfilled' ? moderateRisk.value.count : 0;
       const highRiskCount = highRisk.status === 'fulfilled' ? highRisk.value.count : 0;
       const totalStimuli = stimuliData.status === 'fulfilled' ? stimuliData.value.length : 0;
 
-      const totalAssessments = lowRiskCount + moderateRiskCount + highRiskCount;
+      const totalAssessments = safeRiskCount + lowRiskCount + moderateRiskCount + highRiskCount;   // ✅ safe included
       const totalUsers = totalChildren + totalDoctors; // Simplified calculation
 
       // Determine system health based on data
@@ -118,6 +122,7 @@ class AdminApi {
         totalChildren,
         totalAssessments,
         totalStimuli,
+        safeRiskCount,   // ✅ include safe
         lowRiskCount,
         moderateRiskCount,
         highRiskCount,
@@ -243,6 +248,10 @@ class AdminApi {
     return this.request<GazeResult[]>(`/get-all-reports/${childId}`);
   }
 
+  async getSafeRiskCount(): Promise<{ risk_level: string; count: number }> {
+    return this.request<{ risk_level: string; count: number }>('/count-safe-risk');
+  }
+
   async getLowRiskCount(): Promise<{ risk_level: string; count: number }> {
     return this.request<{ risk_level: string; count: number }>('/count-low-risk');
   }
@@ -339,6 +348,7 @@ class AdminApi {
   // Map risk level from API to frontend format
   mapRiskLevel(apiRiskLevel: string): 'low' | 'moderate' | 'high' {
     switch (apiRiskLevel.toLowerCase()) {
+      case 'safe': return 'safe';      // ✅ added
       case 'low': return 'low';
       case 'moderate': return 'moderate';
       case 'high': return 'high';
@@ -375,7 +385,7 @@ class AdminApi {
       return {
         stats: stats.status === 'fulfilled' ? stats.value : {
           totalUsers: 0, totalDoctors: 0, totalChildren: 0, totalAssessments: 0,
-          totalStimuli: 0, lowRiskCount: 0, moderateRiskCount: 0, highRiskCount: 0,
+          totalStimuli: 0, safeRiskCount: 0, lowRiskCount: 0, moderateRiskCount: 0, highRiskCount: 0,
           systemHealth: 'warning' as const
         },
         recentReports: recentReports.status === 'fulfilled' ? recentReports.value : [],

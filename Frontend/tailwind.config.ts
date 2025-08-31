@@ -58,7 +58,9 @@ export default {
 					moderate: 'hsl(var(--risk-moderate))',
 					'moderate-bg': 'hsl(var(--risk-moderate-bg))',
 					high: 'hsl(var(--risk-high))',
-					'high-bg': 'hsl(var(--risk-high-bg))'
+					'high-bg': 'hsl(var(--risk-high-bg))',
+					safe: 'hsl(var(--risk-safe))',
+					'safe-bg': 'hsl(var(--risk-safe-bg))'
 				},
 				pastel: {
 					blue: 'hsl(var(--pastel-blue))',

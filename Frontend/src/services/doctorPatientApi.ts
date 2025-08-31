@@ -5,7 +5,7 @@ export interface Child {
   name: string;
   dob: string;
   parent_id: string;
-  riskLevel?: 'low' | 'moderate' | 'high';
+  riskLevel?: 'safe' | 'low' | 'moderate' | 'high';
 }
 
 export interface Report {
@@ -13,7 +13,8 @@ export interface Report {
   child_id: string;
   predicted_class: string;
   confidence: number;
-  risk_level: 'Low' | 'Moderate' | 'High';
+  // include Safe as a possible returned value from backend (keep capitalization consistent with existing usage)
+  risk_level: 'Safe' | 'Low' | 'Moderate' | 'High';
   scanpath_path: string;
   heatmap_path: string;
   gaze_data_path: string;
@@ -74,6 +75,10 @@ class DoctorPatientApi {
   }
 
   // Get risk level counts
+  async getSafeRiskCount(): Promise<RiskCounts> {
+    return this.request<RiskCounts>('/count-safe-risk');
+  }
+
   async getLowRiskCount(): Promise<RiskCounts> {
     return this.request<RiskCounts>('/count-low-risk');
   }
@@ -92,8 +97,10 @@ class DoctorPatientApi {
   }
 
   // Map risk level from API to frontend format
-  mapRiskLevel(apiRiskLevel: string): 'low' | 'moderate' | 'high' {
+  // extended to support 'safe'
+  mapRiskLevel(apiRiskLevel: string): 'safe' | 'low' | 'moderate' | 'high' {
     switch (apiRiskLevel.toLowerCase()) {
+      case 'safe': return 'safe';
       case 'low': return 'low';
       case 'moderate': return 'moderate';
       case 'high': return 'high';
@@ -146,7 +153,7 @@ class DoctorPatientApi {
             // If no report found, return child without report
             return {
               ...child,
-              riskLevel: undefined as 'low' | 'moderate' | 'high' | undefined,
+              riskLevel: undefined as 'safe' | 'low' | 'moderate' | 'high' | undefined,
               latestReport: undefined
             };
           }
@@ -154,8 +161,8 @@ class DoctorPatientApi {
       );
 
       return patientsWithReports
-      .filter((result) => result.status === 'fulfilled')
-      .map((result) => (result as PromiseFulfilledResult<Child & { latestReport?: Report }>).value);
+      .filter((result): result is PromiseFulfilledResult<Child & { latestReport?: Report }> => result.status === 'fulfilled')
+      .map((result) => result.value);
     
     } catch (error) {
       console.error('Failed to get all patients with reports:', error);

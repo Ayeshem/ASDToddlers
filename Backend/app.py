@@ -833,6 +833,12 @@ def get_all_reports(child_id):
 
     return jsonify(report_list), 200
 
+#adds safe-risk child count
+# all safe-risk children count
+@app.route('/count-safe-risk', methods=['GET'])
+def count_safe_risk():
+    count = Report.query.filter_by(risk_level="Safe").count()
+    return jsonify({"risk_level": "Safe", "count": count})
 
 # all low-risk children count
 @app.route('/count-low-risk', methods=['GET'])

@@ -278,12 +278,16 @@ def run_gaze_session(child_id, stimulus_id, session_type, base_dir, db, Report,a
             class_name = class_names[index].strip()
             print("Prediction:", class_name)
             print("Confidence:", confidence_score)
-            if float(confidence_score) <= 0.6:
-                risk_level = "Low"
-            elif 0.75 >= float(confidence_score) > 0.6:
-                risk_level = "Moderate"
-            else:
-                risk_level = "High"
+            #made changes here, added risk level safe
+            if class_name == "ASD":
+                if float(confidence_score) <= 0.6:
+                    risk_level = "Low"
+                elif 0.75 >= float(confidence_score) > 0.6:
+                    risk_level = "Moderate"
+                else:
+                    risk_level = "High"
+            elif class_name == "Non-ASD":
+                risk_level = "Safe"
 
             result_filename = os.path.join(session_folder, "prediction_result.txt")
             with open(result_filename, "w") as f:

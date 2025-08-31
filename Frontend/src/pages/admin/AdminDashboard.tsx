@@ -26,6 +26,7 @@ export default function AdminDashboard() {
     totalChildren: 0,
     totalAssessments: 0,
     totalStimuli: 0,
+    safeRiskCount: 0,     // added
     lowRiskCount: 0,
     moderateRiskCount: 0,
     highRiskCount: 0,
@@ -98,6 +99,7 @@ Total Assessments: ${systemStats.totalAssessments}
 Total Stimuli: ${systemStats.totalStimuli}
 
 === RISK DISTRIBUTION ===
+Safe: ${systemStats.safeRiskCount} (${systemStats.totalAssessments > 0 ? ((systemStats.safeRiskCount / systemStats.totalAssessments) * 100).toFixed(1) : 0}%)
 Low Risk: ${systemStats.lowRiskCount} (${systemStats.totalAssessments > 0 ? ((systemStats.lowRiskCount / systemStats.totalAssessments) * 100).toFixed(1) : 0}%)
 Moderate Risk: ${systemStats.moderateRiskCount} (${systemStats.totalAssessments > 0 ? ((systemStats.moderateRiskCount / systemStats.totalAssessments) * 100).toFixed(1) : 0}%)
 High Risk: ${systemStats.highRiskCount} (${systemStats.totalAssessments > 0 ? ((systemStats.highRiskCount / systemStats.totalAssessments) * 100).toFixed(1) : 0}%)

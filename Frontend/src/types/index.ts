@@ -17,7 +17,7 @@ export interface Child {
   lastAssessment?: string; // Optional for backward compatibility
 }
 
-export type RiskLevel = 'low' | 'moderate' | 'high';
+export type RiskLevel = 'safe' | 'low' | 'moderate' | 'high';
 
 export interface Assessment {
   id: string;

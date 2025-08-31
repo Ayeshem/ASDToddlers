@@ -43,6 +43,9 @@ All colors MUST be HSL.
     --risk-moderate-bg: 48 100% 96%;
     --risk-high: 0 84% 60%;
     --risk-high-bg: 0 93% 94%;
+    /* adds green */
+    --risk-safe: 120 60% 40%;      
+    --risk-safe-bg: 120 60% 90%;
 
     /* Beautiful accent colors */
     --pastel-blue: 199 89% 48%;
