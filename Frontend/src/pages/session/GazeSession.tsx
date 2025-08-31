@@ -12,6 +12,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Play, Pause, Square, Eye, Clock, X, AlertCircle } from "lucide-react";
 import { gazeApi, type SessionStatus, type GazeResult } from "@/services/gazeApi";
 import type { GazeData, SessionData } from "@/types";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
+// If your Stimulus type has more fields (thumbnail_url etc.) declare them here
+type Stimulus = {
+  id: string;
+  title: string;
+  category?: string;
+  duration?: string | number;
+  video_url: string;
+  thumbnail_url?: string | null;
+};
 
 export default function GazeSession() {
   const { childId } = useParams();
@@ -37,14 +48,20 @@ export default function GazeSession() {
   const child = children.find(c => c.id === childId);
   const [localChild, setLocalChild] = useState<ApiChild | null>(null);
   const resolvedChild = child || localChild;
-  const selectedStimulus = stimuli.find(s => s.id === selectedStimulusId);
+
+  // thumbnails state: id => dataURL | remote thumbnail url | null (null means failed)
+  const [thumbnails, setThumbnails] = useState<Record<string, string | null>>({});
+  // track which stimuli are being generated to avoid duplicate work
+  const generatingRef = useRef<Record<string, boolean>>({});
+
+  const selectedStimulus = (stimuli as Stimulus[]).find(s => s.id === selectedStimulusId) as Stimulus | undefined;
   const selectedStimulusDurationSec = selectedStimulus?.duration
-    ? parseInt(selectedStimulus.duration, 10)
+    ? parseInt(String(selectedStimulus.duration), 10)
     : 0;
 
   useEffect(() => {
     // Auto-select first stimulus if available
-    if (stimuli.length > 0 && !selectedStimulusId) {
+    if (stimuli && stimuli.length > 0 && !selectedStimulusId) {
       setSelectedStimulusId(stimuli[0].id);
     }
   }, [stimuli, selectedStimulusId]);
@@ -236,6 +253,105 @@ export default function GazeSession() {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  // Helper: create a thumbnail by drawing a frame from the video to a canvas
+  const createThumbnailFromVideo = (url: string): Promise<string | null> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.crossOrigin = 'anonymous';
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+
+      let timeoutId: number | null = null;
+      const cleanup = () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        try {
+          video.pause();
+          video.removeAttribute('src');
+          video.load();
+          video.remove();
+        } catch (e) {
+          // ignore
+        }
+      };
+
+      const onLoaded = () => {
+        const seekTime = Math.min(0.5, Math.max(0, (video.duration || 0) / 2));
+        const onSeeked = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 320;
+            canvas.height = video.videoHeight || 180;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('No canvas context');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            cleanup();
+            resolve(dataUrl);
+          } catch (e) {
+            cleanup();
+            resolve(null);
+          }
+        };
+
+        video.addEventListener('seeked', onSeeked, { once: true });
+        try {
+          video.currentTime = seekTime;
+        } catch (e) {
+          // Seeking may throw on some browsers for remote resources
+          cleanup();
+          resolve(null);
+        }
+      };
+
+      const onError = () => {
+        cleanup();
+        resolve(null);
+      };
+
+      video.addEventListener('loadeddata', onLoaded, { once: true });
+      video.addEventListener('error', onError, { once: true });
+      video.src = url;
+
+      // timeout fallback to avoid hanging forever
+      timeoutId = window.setTimeout(() => {
+        cleanup();
+        resolve(null);
+      }, 5000);
+    });
+  };
+
+  // Generate thumbnails for stimuli (if there isn't a remote thumbnail already)
+  useEffect(() => {
+    let mounted = true;
+    if (!stimuli || stimuli.length === 0) return;
+
+    (async () => {
+      for (const s of stimuli as Stimulus[]) {
+        if (!mounted) break;
+        if (thumbnails[s.id] !== undefined) continue; // already set (either url or null)
+        if (generatingRef.current[s.id]) continue;
+
+        // if server already provides a thumbnail URL, just use it
+        if (s.thumbnail_url) {
+          setThumbnails(prev => ({ ...prev, [s.id]: s.thumbnail_url ?? null }));
+          continue;
+        }
+
+        generatingRef.current[s.id] = true;
+        const thumb = await createThumbnailFromVideo(s.video_url);
+        if (!mounted) break;
+        setThumbnails(prev => ({ ...prev, [s.id]: thumb }));
+        generatingRef.current[s.id] = false;
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [stimuli]);
+
   if (!resolvedChild) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -305,31 +421,52 @@ export default function GazeSession() {
                     <label className="text-sm font-medium mb-2 block">
                       Select Video Stimulus
                     </label>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      {stimuli.map((stimulus) => (
-                        <div
-                          key={stimulus.id}
-                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                            selectedStimulusId === stimulus.id
-                              ? 'border-primary bg-primary/5'
-                              : 'border-border hover:bg-muted/50'
-                          }`}
-                          onClick={() => setSelectedStimulusId(stimulus.id)}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="w-16 h-12 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                              Video
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{stimulus.title}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {stimulus.category}{' '}
-                                {stimulus.duration ? `• ${Math.floor(parseInt(stimulus.duration, 10) / 60)}m` : ''}
-                              </p>
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                      {stimuli.map((stimulus: Stimulus) => {
+                        const thumb = thumbnails[stimulus.id];
+                        const isSelected = selectedStimulusId === stimulus.id;
+                        return (
+                          <div
+                            key={stimulus.id}
+                            className={`p-6 border rounded-xl cursor-pointer transition-colors ${
+                              isSelected
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border hover:bg-muted/50'
+                            }`}
+                            onClick={() => setSelectedStimulusId(stimulus.id)}
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="w-24 h-16 rounded overflow-hidden bg-muted flex items-center justify-center text-sm text-muted-foreground">
+                                {thumb === undefined && (
+                                  <div className="flex items-center justify-center w-full h-full">
+                                    <LoadingSpinner />
+                                  </div>
+                                )}
+
+                                {thumb === null && (
+                                  // generation failed or no thumbnail available
+                                  <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">Video</div>
+                                )}
+
+                                {thumb && (
+                                  <img
+                                    src={thumb}
+                                    alt={`${stimulus.title} thumbnail`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-base">{stimulus.title}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {stimulus.category}{' '}
+                                  {stimulus.duration ? `• ${Math.floor(parseInt(String(stimulus.duration), 10) / 60)}m` : ''}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                   
@@ -355,14 +492,18 @@ export default function GazeSession() {
             <Card className="mx-auto max-w-4xl">
               <CardContent className="p-0">
                 <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
-                  {<video
-                    className="w-full h-full object-cover"
-                    src={selectedStimulus?.video_url}
-                    controls
-                    autoPlay
-                    onEnded={endSession}
-                  />}
-                  
+                  {selectedStimulus && (
+                    <video
+                      key={selectedStimulus.id}
+                      className="w-full h-full object-cover"
+                      src={selectedStimulus.video_url}
+                      controls
+                      autoPlay
+                      onEnded={endSession}
+                      // show poster if we have generated thumbnail
+                      poster={thumbnails[selectedStimulus.id] ?? selectedStimulus.thumbnail_url ?? undefined}
+                    />
+                  )}
                   
                   {/* Mock gaze overlay points */}
                   {gazePoints.slice(-10).map((point, index) => (
