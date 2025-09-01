@@ -125,12 +125,24 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
   const calculateAge = (dob: string) => {
     const birthDate = new Date(dob);
     const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
-    return age;
+  
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+  
+    if (today.getDate() < birthDate.getDate()) {
+      months--;
+    }
+  
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+  
+    if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
+    if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
+    return 'Less than a month';
   };
-
+  
   if (!patient) return null;
 
   return (
@@ -171,7 +183,7 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Age</p>
-                      <p className="text-lg font-semibold">{calculateAge(patient.dob)} years old</p>
+                      <p className="text-lg font-semibold">{calculateAge(patient.dob)} old</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Date of Birth</p>

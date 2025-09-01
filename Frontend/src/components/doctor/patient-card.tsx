@@ -39,19 +39,28 @@ export function PatientCard({
   onDownloadReport, 
   onSchedule 
 }: PatientCardProps) {
+
   const calculateAge = (dob: string) => {
     const birth = new Date(dob);
     const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
+  
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+  
+    if (today.getDate() < birth.getDate()) {
+      months--;
     }
-    
-    return age;
+  
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+  
+    if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
+    if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
+    return 'Less than a month';
   };
-
+  
   const { latestReport } = patient;
 
   return (
@@ -67,7 +76,7 @@ export function PatientCard({
             <div>
               <CardTitle className="text-2xl mb-1">{patient.name}</CardTitle>
               <CardDescription className="text-sm">
-                {calculateAge(patient.dob)} years old
+                {calculateAge(patient.dob)} old
                 <span className="mx-1.5">·</span>
                 ID: #{patient.id}
               </CardDescription>
