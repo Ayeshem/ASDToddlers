@@ -1,0 +1,11 @@
+ASD Prediction Result
+=====================
+Timestamp       : 20250901_024142
+Child_ID        : 1
+Stimulus_ID     : 1
+Heatmap Image   : results/1/20250901_024102/heatmap.png
+Session_Type    : default
+Scanpath Image  : results/1/20250901_024102/scanpath.png
+Predicted Class : ASD
+Risk Level      : High
+Confidence      : 0.943426

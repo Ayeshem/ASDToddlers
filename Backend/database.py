@@ -21,6 +21,8 @@ class Child(db.Model):
     name = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)  # Date of Birth
     parent_id = db.Column(db.String(50), nullable=False)  # Changed to String to handle frontend IDs
+    photo = db.Column(db.String(255), nullable=True)  # e.g., "/uploads/children/abcd1234.jpg"
+
 
 
 class DoctorDetails(db.Model):
