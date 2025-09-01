@@ -74,8 +74,8 @@ class DoctorApi {
   }
 
   // Create a new doctor
-  async createDoctor(data: CreateDoctorRequest): Promise<{ message: string; doctor_id: number }> {
-    return this.request<{ message: string; doctor_id: number }>('/create-doctor', {
+  async createDoctor(data: CreateDoctorRequest): Promise<{ message: string; doctorId: number }> {
+    return this.request<{ message: string; doctorId: number }>('/create-doctor', {
       method: 'POST',
       body: JSON.stringify(data),
     });

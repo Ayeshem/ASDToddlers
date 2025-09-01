@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,22 +12,20 @@ import { useAppointmentStore } from "@/store/appointmentStore";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi, type Doctor, type Child } from "@/services/adminApi";
-import { Calendar as CalendarIcon, Clock, Plus, Edit, Trash2, CheckCircle, XCircle, AlertTriangle, RefreshCw } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Plus, CheckCircle, XCircle, Trash2, AlertTriangle, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import type { Appointment } from "@/types";
 
 export default function AppointmentScheduler() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
-  
-  // Real API data states
+
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [children, setChildren] = useState<Child[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [newAppointment, setNewAppointment] = useState({
     doctorId: "",
     childId: "",
@@ -37,59 +34,8 @@ export default function AppointmentScheduler() {
   });
 
   const user = useAuthStore(state => state.user);
-  const { appointments, addAppointment, updateAppointment, deleteAppointment, getAppointmentsByDate } = useAppointmentStore();
+  const { appointments, fetchAppointments, addAppointment, updateAppointment, deleteAppointment, getAppointmentsByDate } = useAppointmentStore();
   const { toast } = useToast();
-
-  // Fetch doctors and children data
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const [doctorsData, childrenData] = await Promise.allSettled([
-        adminApi.getAllDoctors(),
-        adminApi.getAllChildren()
-      ]);
-
-      if (doctorsData.status === 'fulfilled') {
-        setDoctors(doctorsData.value);
-      } else {
-        console.error('Failed to fetch doctors:', doctorsData.reason);
-      }
-
-      if (childrenData.status === 'fulfilled') {
-        setChildren(childrenData.value.children);
-      } else {
-        console.error('Failed to fetch children:', childrenData.reason);
-      }
-
-    } catch (error) {
-      console.error('Failed to fetch appointment data:', error);
-      setError('Failed to load appointment data');
-      toast({
-        title: "Error",
-        description: "Failed to load doctors and children data. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Filter children based on user role (using correct property name)
-  const availableChildren = user?.role === 'parent' 
-    ? children.filter(child => child.parent_id === user.id)
-    : children;
-
-  // Filter doctors to only active ones (using correct property name)
-  const activeDoctors = doctors.filter(doctor => doctor.status === 'active');
-
-  const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
-  const dayAppointments = getAppointmentsByDate(selectedDateString);
 
   const timeSlots = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -97,7 +43,75 @@ export default function AppointmentScheduler() {
     '15:00', '15:30', '16:00', '16:30', '17:00'
   ];
 
-  const handleScheduleAppointment = () => {
+  // Fetch all necessary data in correct order
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Fetch doctors & children
+        const [doctorsData, childrenData] = await Promise.allSettled([
+          adminApi.getAllDoctors(),
+          adminApi.getAllChildren()
+        ]);
+
+        if (doctorsData.status === 'fulfilled') setDoctors(doctorsData.value);
+        else console.error('Failed to fetch doctors:', doctorsData.reason);
+
+        if (childrenData.status === 'fulfilled') setChildren(childrenData.value.children);
+        else console.error('Failed to fetch children:', childrenData.reason);
+
+        // Fetch appointments after doctors & children
+        await fetchAppointments();
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        setError('Failed to load appointment data.');
+        toast({
+          title: "Error",
+          description: "Failed to load doctors, children, or appointments.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [fetchAppointments, toast]);
+
+  // Filter children for current user
+  const availableChildren = user?.role === 'parent'
+    ? children.filter(c => c.parent_id === user.id)
+    : children;
+
+  const activeDoctors = doctors.filter(d => d.status === 'active');
+
+  const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
+  const dayAppointments = (children.length > 0 && doctors.length > 0)
+  ? getAppointmentsByDate(selectedDateString)
+  : [];
+
+  const getChildName = (childId: string) =>
+    children.length === 0
+      ? 'Unknown Child'
+      : children.find(c => String(c.id) === String(childId))?.name ?? 'Unknown Child';
+  
+  const getDoctorName = (doctorId: string) =>
+    doctors.length === 0
+      ? 'Unknown Doctor'
+      : doctors.find(d => String(d.id) === String(doctorId))?.full_name ?? 'Unknown Doctor';
+    
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'scheduled': return 'bg-pastel-blue text-blue-700';
+      case 'completed': return 'bg-risk-low-bg text-risk-low';
+      case 'cancelled': return 'bg-risk-high-bg text-risk-high';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const handleScheduleAppointment = async () => {
     if (!newAppointment.doctorId || !newAppointment.childId || !newAppointment.time) {
       toast({
         title: "Error",
@@ -108,8 +122,7 @@ export default function AppointmentScheduler() {
     }
 
     const child = children.find(c => c.id === newAppointment.childId);
-    
-    addAppointment({
+    await addAppointment({
       ...newAppointment,
       parentId: child?.parent_id || '',
       date: selectedDateString,
@@ -125,37 +138,20 @@ export default function AppointmentScheduler() {
     setShowScheduleModal(false);
   };
 
-  const handleUpdateAppointmentStatus = (appointment: Appointment, newStatus: 'completed' | 'cancelled') => {
-    updateAppointment(appointment.id, { status: newStatus });
+  const handleUpdateAppointmentStatus = async (appointment: Appointment, newStatus: 'completed' | 'cancelled') => {
+    await updateAppointment(appointment.id, { status: newStatus });
     toast({
       title: `Appointment ${newStatus}`,
       description: `The appointment has been marked as ${newStatus}.`,
     });
   };
 
-  const handleDeleteAppointment = (appointment: Appointment) => {
-    deleteAppointment(appointment.id);
+  const handleDeleteAppointment = async (appointment: Appointment) => {
+    await deleteAppointment(appointment.id);
     toast({
       title: "Appointment deleted",
       description: "The appointment has been removed.",
     });
-  };
-
-  const getChildName = (childId: string) => {
-    return children.find(c => c.id === childId)?.name || 'Unknown Child';
-  };
-
-  const getDoctorName = (doctorId: string) => {
-    return doctors.find(d => d.id === doctorId)?.full_name || 'Unknown Doctor';
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'scheduled': return 'bg-pastel-blue text-blue-700';
-      case 'completed': return 'bg-risk-low-bg text-risk-low';
-      case 'cancelled': return 'bg-risk-high-bg text-risk-high';
-      default: return 'bg-muted text-muted-foreground';
-    }
   };
 
   if (isLoading) {
@@ -174,7 +170,7 @@ export default function AppointmentScheduler() {
         <div className="text-center py-12">
           <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
           <p className="text-red-600 mb-4">{error}</p>
-          <Button variant="outline" onClick={fetchData}>
+          <Button variant="outline" onClick={() => window.location.reload()}>
             <AlertTriangle className="h-4 w-4 mr-2" />
             Try Again
           </Button>
@@ -182,6 +178,9 @@ export default function AppointmentScheduler() {
       </DashboardLayout>
     );
   }
+
+
+
 
   return (
     <DashboardLayout>
@@ -194,13 +193,13 @@ export default function AppointmentScheduler() {
               Schedule and manage appointments • {activeDoctors.length} active doctors • {availableChildren.length} children
             </p>
           </div>
-          
+  
           <div className="flex gap-2">
-            <Button variant="outline" onClick={fetchData} size="sm">
+            <Button variant="outline" onClick={() => fetchAppointments()} size="sm">
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh Data
             </Button>
-            
+  
             <div className="flex bg-muted rounded-lg p-1">
               <Button
                 variant={viewMode === 'week' ? 'default' : 'ghost'}
@@ -217,7 +216,7 @@ export default function AppointmentScheduler() {
                 Month
               </Button>
             </div>
-            
+  
             <Dialog open={showScheduleModal} onOpenChange={setShowScheduleModal}>
               <DialogTrigger asChild>
                 <Button>
@@ -237,7 +236,7 @@ export default function AppointmentScheduler() {
                       {format(selectedDate, 'MMMM dd, yyyy')}
                     </div>
                   </div>
-                  
+  
                   <div className="space-y-2">
                     <Label htmlFor="doctor">Doctor *</Label>
                     <Select 
@@ -249,9 +248,7 @@ export default function AppointmentScheduler() {
                       </SelectTrigger>
                       <SelectContent>
                         {activeDoctors.length === 0 ? (
-                          <SelectItem value="" disabled>
-                            No active doctors available
-                          </SelectItem>
+                          <SelectItem value="" disabled>No active doctors available</SelectItem>
                         ) : (
                           activeDoctors.map((doctor) => (
                             <SelectItem key={doctor.id} value={doctor.id}>
@@ -262,7 +259,7 @@ export default function AppointmentScheduler() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+  
                   <div className="space-y-2">
                     <Label htmlFor="child">Child/Patient *</Label>
                     <Select 
@@ -287,7 +284,7 @@ export default function AppointmentScheduler() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+  
                   <div className="space-y-2">
                     <Label htmlFor="time">Time *</Label>
                     <Select 
@@ -310,7 +307,7 @@ export default function AppointmentScheduler() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+  
                   <div className="space-y-2">
                     <Label htmlFor="notes">Notes</Label>
                     <Textarea
@@ -320,7 +317,7 @@ export default function AppointmentScheduler() {
                       placeholder="Additional notes or instructions"
                     />
                   </div>
-                  
+  
                   <div className="flex gap-2">
                     <Button onClick={handleScheduleAppointment} className="flex-1">
                       Schedule Appointment
@@ -334,7 +331,7 @@ export default function AppointmentScheduler() {
             </Dialog>
           </div>
         </div>
-
+  
         {/* Main Content */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Calendar */}
@@ -354,14 +351,12 @@ export default function AppointmentScheduler() {
               />
             </CardContent>
           </Card>
-
+  
           {/* Selected Day Schedule */}
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>
-                  Schedule for {format(selectedDate, 'MMMM dd, yyyy')}
-                </span>
+                <span>Schedule for {format(selectedDate, 'MMMM dd, yyyy')}</span>
                 <span className="text-sm font-normal text-muted-foreground">
                   {dayAppointments.length} appointment{dayAppointments.length !== 1 ? 's' : ''}
                 </span>
@@ -372,11 +367,7 @@ export default function AppointmentScheduler() {
                 <div className="text-center py-8 text-muted-foreground">
                   <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
                   <p>No appointments scheduled for this day.</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-3"
-                    onClick={() => setShowScheduleModal(true)}
-                  >
+                  <Button variant="outline" className="mt-3" onClick={() => setShowScheduleModal(true)}>
                     Schedule Appointment
                   </Button>
                 </div>
@@ -402,7 +393,7 @@ export default function AppointmentScheduler() {
                           <p className="text-sm text-muted-foreground mt-1">{appointment.notes}</p>
                         )}
                       </div>
-                      
+  
                       <div className="flex gap-1">
                         {appointment.status === 'scheduled' && (
                           <>
@@ -440,36 +431,25 @@ export default function AppointmentScheduler() {
             </CardContent>
           </Card>
         </div>
-
+  
         {/* Upcoming Appointments Summary */}
         <Card>
           <CardHeader>
             <CardTitle>Upcoming Appointments</CardTitle>
           </CardHeader>
           <CardContent>
-            {appointments.filter(apt => {
-              const aptDate = new Date(apt.date);
-              const today = new Date();
-              return aptDate >= today && apt.status === 'scheduled';
-            }).length === 0 ? (
+            {appointments.filter(apt => new Date(apt.date) >= new Date() && apt.status === 'scheduled').length === 0 ? (
               <p className="text-muted-foreground">No upcoming appointments.</p>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {appointments
-                  .filter(apt => {
-                    const aptDate = new Date(apt.date);
-                    const today = new Date();
-                    return aptDate >= today && apt.status === 'scheduled';
-                  })
+                  .filter(apt => new Date(apt.date) >= new Date() && apt.status === 'scheduled')
                   .slice(0, 6)
                   .map((appointment) => (
                     <div key={appointment.id} className="p-3 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium">{format(new Date(appointment.date), 'MMM dd')}</span>
-                        <span className="text-sm text-muted-foreground">{appointment.time}</span>
-                      </div>
-                      <p className="text-sm font-medium">{getChildName(appointment.childId)}</p>
-                      <p className="text-xs text-muted-foreground">{getDoctorName(appointment.doctorId)}</p>
+                      <p className="font-medium">{appointment.time}</p>
+                      <p className="text-sm text-muted-foreground">{getChildName(appointment.childId)}</p>
+                      <p className="text-sm text-muted-foreground">{getDoctorName(appointment.doctorId)}</p>
                     </div>
                   ))}
               </div>
@@ -479,4 +459,4 @@ export default function AppointmentScheduler() {
       </div>
     </DashboardLayout>
   );
-}
+}  

@@ -381,7 +381,7 @@ export default function DoctorDashboard() {
   };
 
   const handleSchedule = (patient: Child) => {
-    navigate('/appointments');
+    navigate('/view-appointments');
   };
 
   const handleRefresh = () => {

@@ -882,7 +882,7 @@ from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from database import db, User, Child, DoctorDetails, StimuliVideo, Report
+from database import db, User, Child, DoctorDetails, StimuliVideo, Report, Appointment
 from datetime import date, datetime
 from werkzeug.utils import secure_filename
 from io import BytesIO
@@ -1562,6 +1562,148 @@ def get_doctor_count():
     return jsonify({"total_doctors": total}), 200
 # ---------------------------------------------------------------------------------------------------------------------#
 
+#------------------------- Appointment Routes -------------------------#
+
+# Create an appointment
+@app.route('/appointments', methods=['POST'])
+def create_appointment():
+    data = request.get_json()
+    parent_id = data.get('parent_id')
+    doctor_id = data.get('doctor_id')
+    child_id = data.get('child_id')
+    date_str = data.get('date')
+    time_str = data.get('time')
+    notes = data.get('notes')
+
+    if not all([parent_id, doctor_id, child_id, date_str, time_str]):
+        return jsonify({"error": "All fields except notes are required"}), 400
+
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+
+    new_appointment = Appointment(
+        parent_id=parent_id,
+        doctor_id=doctor_id,
+        child_id=child_id,
+        date=date_obj,
+        time=time_str,
+        notes=notes
+    )
+    db.session.add(new_appointment)
+    db.session.commit()
+    return jsonify({"message": "Appointment created successfully", "appointment_id": new_appointment.id}), 201
+
+
+# Get all appointments
+@app.route('/appointments', methods=['GET'])
+def get_appointments():
+    appointments = Appointment.query.all()
+    result = []
+    for appt in appointments:
+        result.append({
+            "id": appt.id,
+            "parent_id": appt.parent_id,
+            "doctor_id": appt.doctor_id,
+            "child_id": appt.child_id,
+            "date": appt.date.strftime("%Y-%m-%d"),
+            "time": appt.time,
+            "notes": appt.notes,
+            "status": appt.status
+        })
+    return jsonify(result), 200
+
+
+# Get appointment by ID
+@app.route('/appointments/<int:appointment_id>', methods=['GET'])
+def get_appointment(appointment_id):
+    appt = Appointment.query.get(appointment_id)
+    if not appt:
+        return jsonify({"error": "Appointment not found"}), 404
+    return jsonify({
+        "id": appt.id,
+        "parent_id": appt.parent_id,
+        "doctor_id": appt.doctor_id,
+        "child_id": appt.child_id,
+        "date": appt.date.strftime("%Y-%m-%d"),
+        "time": appt.time,
+        "notes": appt.notes,
+        "status": appt.status
+    }), 200
+
+
+# Update appointment
+@app.route('/appointments/<int:appointment_id>', methods=['PUT'])
+def update_appointment(appointment_id):
+    appt = Appointment.query.get(appointment_id)
+    if not appt:
+        return jsonify({"error": "Appointment not found"}), 404
+
+    data = request.get_json()
+    appt.parent_id = data.get('parent_id', appt.parent_id)
+    appt.doctor_id = data.get('doctor_id', appt.doctor_id)
+    appt.child_id = data.get('child_id', appt.child_id)
+    date_str = data.get('date')
+    if date_str:
+        try:
+            appt.date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+    appt.time = data.get('time', appt.time)
+    appt.notes = data.get('notes', appt.notes)
+    appt.status = data.get('status', appt.status)
+    db.session.commit()
+    return jsonify({"message": "Appointment updated successfully"}), 200
+
+
+# Delete appointment
+@app.route('/appointments/<int:appointment_id>', methods=['DELETE'])
+def delete_appointment(appointment_id):
+    appt = Appointment.query.get(appointment_id)
+    if not appt:
+        return jsonify({"error": "Appointment not found"}), 404
+    db.session.delete(appt)
+    db.session.commit()
+    return jsonify({"message": "Appointment deleted successfully"}), 200
+
+
+# Get appointments for a specific doctor
+@app.route('/doctor/<doctor_id>/appointments', methods=['GET'])
+def get_doctor_appointments(doctor_id):
+    appointments = Appointment.query.filter_by(doctor_id=doctor_id).all()
+    result = []
+    for appt in appointments:
+        result.append({
+            "id": appt.id,
+            "parent_id": appt.parent_id,
+            "child_id": appt.child_id,
+            "date": appt.date.strftime("%Y-%m-%d"),
+            "time": appt.time,
+            "notes": appt.notes,
+            "status": appt.status
+        })
+    return jsonify(result), 200
+
+
+# Get appointments for a specific parent
+@app.route('/parent/<parent_id>/appointments', methods=['GET'])
+def get_parent_appointments(parent_id):
+    appointments = Appointment.query.filter_by(parent_id=parent_id).all()
+    result = []
+    for appt in appointments:
+        result.append({
+            "id": appt.id,
+            "doctor_id": appt.doctor_id,
+            "child_id": appt.child_id,
+            "date": appt.date.strftime("%Y-%m-%d"),
+            "time": appt.time,
+            "notes": appt.notes,
+            "status": appt.status
+        })
+    return jsonify(result), 200
+
+#-----------------------------------------------------------------------------------------------------
 
 # Entrypoint
 @app.route('/', methods=['GET'])

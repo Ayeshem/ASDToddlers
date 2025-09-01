@@ -56,3 +56,16 @@ class Report(db.Model):
     heatmap_path = db.Column(db.String(255), nullable=False)
     gaze_data_path = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+
+class Appointment(db.Model):
+    __tablename__ = 'appointment'
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.String(50), nullable=False)
+    doctor_id = db.Column(db.String(50), nullable=False)
+    child_id = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.String(10), nullable=False)  # 'HH:mm'
+    notes = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(20), default='scheduled')  # scheduled / completed / cancelled
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
