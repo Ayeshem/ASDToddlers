@@ -17,14 +17,10 @@ import {
   Activity,
   FileText,
   Brain,
-  Target,
-  Image as ImageIcon,
-  Route,
-  Database
+  Target
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 
-// --- Augment Child type locally to include photoUrl ---
 type Child = APIChild & {
   latestReport?: Report;
   riskLevel?: 'safe' | 'low' | 'moderate' | 'high';
@@ -36,7 +32,6 @@ type Report = APIReport & {
   scanpath_path?: string;
   gaze_data?: any;
 };
-
 
 interface PatientDetailsModalProps {
   patient: Child | null;
@@ -59,33 +54,20 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
 
   const fetchPatientReports = async () => {
     if (!patient) return;
-
     setIsLoading(true);
     setError(null);
-
     try {
       const [allReports, latest] = await Promise.allSettled([
         doctorPatientApi.getAllReports(patient.id),
         doctorPatientApi.getLatestReport(patient.id)
       ]);
-
-      if (allReports.status === 'fulfilled') {
-        setReports(allReports.value);
-      }
-
-      if (latest.status === 'fulfilled') {
-        setLatestReport(latest.value);
-      } else {
-        setLatestReport(null);
-      }
+      if (allReports.status === 'fulfilled') setReports(allReports.value);
+      if (latest.status === 'fulfilled') setLatestReport(latest.value);
+      else setLatestReport(null);
     } catch (error) {
       console.error('Failed to fetch patient reports:', error);
       setError('Failed to load patient reports');
-      toast({
-        title: "Error",
-        description: "Failed to load patient reports",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to load patient reports", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -93,25 +75,14 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
 
   const handleDownloadReport = async (report: Report) => {
     try {
-      toast({
-        title: "Download Starting",
-        description: `Downloading report for ${patient?.name}...`,
-      });
-
+      toast({ title: "Download Starting", description: `Downloading report for ${patient?.name}...` });
       const reportData = {
-        patient: patient?.name,
-        date: report.created_at,
-        riskLevel: report.risk_level,
-        confidence: report.confidence,
-        predictedClass: report.predicted_class,
-        heatmap: report.heatmap_path ?? null,
-        scanpath: report.scanpath_path ?? null,
+        patient: patient?.name, date: report.created_at, riskLevel: report.risk_level,
+        confidence: report.confidence, predictedClass: report.predicted_class,
+        heatmap: report.heatmap_path ?? null, scanpath: report.scanpath_path ?? null,
         gazeData: report.gaze_data ?? null,
       };
-
-      const blob = new Blob([JSON.stringify(reportData, null, 2)], { 
-        type: 'application/json' 
-      });
+      const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -120,38 +91,24 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
-      toast({
-        title: "Download Complete",
-        description: "Report has been downloaded successfully.",
-      });
+      toast({ title: "Download Complete", description: "Report has been downloaded successfully." });
     } catch (error) {
-      toast({
-        title: "Download Failed",
-        description: "Failed to download the report.",
-        variant: "destructive",
-      });
+      toast({ title: "Download Failed", description: "Failed to download the report.", variant: "destructive" });
     }
   };
 
   const downloadFile = (filePath: string, fileName: string) => {
     const a = document.createElement('a');
-    a.href = filePath;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = filePath; a.download = fileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   };
 
   const downloadGazeData = (data: any, fileName: string) => {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = fileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
@@ -170,9 +127,7 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
     return age;
   };
 
@@ -180,17 +135,19 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
-        <DialogHeader>
+      {/* --- FIX: Make the dialog scrollable, remove padding and flex layout --- */}
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+        {/* --- FIX: Make header sticky and add padding/styling --- */}
+        <DialogHeader className="sticky top-0 z-10 bg-background px-6 pt-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Patient Details - {patient.name}
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[80vh] pr-6">
-          <div className="space-y-6">
-            {/* Patient Information */}
+        {/* --- FIX: Add padding to the main content area --- */}
+        <div className="px-6">
+          <div className="space-y-6 my-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -229,7 +186,6 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
               </CardContent>
             </Card>
 
-            {/* Latest Assessment */}
             {latestReport && (
               <Card>
                 <CardHeader>
@@ -262,32 +218,31 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                     </div>
                   </div>
                   
-                  {/* --- Visuals Tabs for Latest Report --- */}
-                  <Tabs defaultValue="heatmap" className="mt-6">
+                  <Tabs defaultValue="scanpath" className="mt-6">
                     <TabsList>
-                      {latestReport.heatmap_path && <TabsTrigger value="heatmap">Heatmap</TabsTrigger>}
                       {latestReport.scanpath_path && <TabsTrigger value="scanpath">Scanpath</TabsTrigger>}
+                      {latestReport.heatmap_path && <TabsTrigger value="heatmap">Heatmap</TabsTrigger>}
                       {latestReport.gaze_data && <TabsTrigger value="gaze">Gaze Data</TabsTrigger>}
                     </TabsList>
-                    
-                    {latestReport.heatmap_path && (
-                        <TabsContent value="heatmap">
-                            <div className="mt-2 p-4 border rounded-lg bg-muted/30">
-                                <img src={latestReport.heatmap_path} alt="Heatmap" className="w-full max-w-md mx-auto rounded border" />
-                                <Button className="mt-3 w-full" size="sm" variant="outline"
-                                    onClick={() => downloadFile(latestReport.heatmap_path!, `${patient?.name}_heatmap.png`)}>
-                                    <Download className="h-3 w-3 mr-2" /> Download Heatmap
-                                </Button>
-                            </div>
-                        </TabsContent>
-                    )}
+
                     {latestReport.scanpath_path && (
                         <TabsContent value="scanpath">
                             <div className="mt-2 p-4 border rounded-lg bg-muted/30">
                                 <img src={latestReport.scanpath_path} alt="Scanpath" className="w-full max-w-md mx-auto rounded border" />
-                                <Button className="mt-3 w-full" size="sm" variant="outline"
+                                <Button className="mt-3" size="sm" variant="outline"
                                     onClick={() => downloadFile(latestReport.scanpath_path!, `${patient?.name}_scanpath.png`)}>
                                     <Download className="h-3 w-3 mr-2" /> Download Scanpath
+                                </Button>
+                            </div>
+                        </TabsContent>
+                    )}
+                    {latestReport.heatmap_path && (
+                        <TabsContent value="heatmap">
+                            <div className="mt-2 p-4 border rounded-lg bg-muted/30">
+                                <img src={latestReport.heatmap_path} alt="Heatmap" className="w-full max-w-md mx-auto rounded border" />
+                                <Button className="mt-3" size="sm" variant="outline"
+                                    onClick={() => downloadFile(latestReport.heatmap_path!, `${patient?.name}_heatmap.png`)}>
+                                    <Download className="h-3 w-3 mr-2" /> Download Heatmap
                                 </Button>
                             </div>
                         </TabsContent>
@@ -296,7 +251,7 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                          <TabsContent value="gaze">
                             <div className="mt-2 p-4 border rounded-lg bg-muted/30">
                                <pre className="text-xs bg-background p-3 rounded-md overflow-auto max-h-60">{JSON.stringify(latestReport.gaze_data, null, 2)}</pre>
-                               <Button className="mt-3 w-full" size="sm" variant="outline"
+                               <Button className="mt-3" size="sm" variant="outline"
                                    onClick={() => downloadGazeData(latestReport.gaze_data, `${patient?.name}_gaze_data.json`)}>
                                    <Download className="h-3 w-3 mr-2" /> Download Gaze Data
                                </Button>
@@ -315,7 +270,6 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
               </Card>
             )}
 
-            {/* Reports History */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -325,9 +279,7 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <LoadingSpinner size="md" text="Loading reports..." />
-                  </div>
+                  <div className="flex items-center justify-center py-8"><LoadingSpinner size="md" text="Loading reports..." /></div>
                 ) : error ? (
                   <div className="text-center py-8">
                     <p className="text-red-600">{error}</p>
@@ -352,14 +304,8 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                               <span className="font-medium">{report.predicted_class}</span>
                             </div>
                             <div className="mt-2 text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1">
-                              <span className="flex items-center gap-1.5">
-                                <Calendar className="h-3.5 w-3.5" />
-                                {format(parseISO(report.created_at), 'MMM dd, yyyy HH:mm')}
-                              </span>
-                              <span className="flex items-center gap-1.5">
-                                <TrendingUp className="h-3.5 w-3.5" />
-                                {(report.confidence * 100).toFixed(1)}% confidence
-                              </span>
+                              <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{format(parseISO(report.created_at), 'MMM dd, yyyy HH:mm')}</span>
+                              <span className="flex items-center gap-1.5"><TrendingUp className="h-3.5 w-3.5" />{(report.confidence * 100).toFixed(1)}% confidence</span>
                             </div>
                           </div>
                           <Button variant="outline" size="sm" onClick={() => handleDownloadReport(report)} className="w-full sm:w-auto">
@@ -367,36 +313,26 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                           </Button>
                         </div>
 
-                        {/* --- Visuals Tabs for History Reports --- */}
-                        {(report.heatmap_path || report.scanpath_path || report.gaze_data) && (
-                            <Tabs defaultValue="heatmap" className="mt-4 pt-4 border-t">
+                        {(report.scanpath_path || report.heatmap_path || report.gaze_data) && (
+                            <Tabs defaultValue="scanpath" className="mt-4 pt-4 border-t">
                                 <TabsList>
-                                    {report.heatmap_path && <TabsTrigger value="heatmap">Heatmap</TabsTrigger>}
                                     {report.scanpath_path && <TabsTrigger value="scanpath">Scanpath</TabsTrigger>}
+                                    {report.heatmap_path && <TabsTrigger value="heatmap">Heatmap</TabsTrigger>}
                                     {report.gaze_data && <TabsTrigger value="gaze">Gaze Data</TabsTrigger>}
                                 </TabsList>
-
-                                {report.heatmap_path && (
-                                    <TabsContent value="heatmap">
-                                        <div className="mt-2">
-                                            {/* NOTE: Smaller image size for history items */}
-                                            <img src={report.heatmap_path} alt="Heatmap" className="w-full max-w-[240px] rounded border" />
-                                        </div>
-                                    </TabsContent>
-                                )}
                                 {report.scanpath_path && (
                                     <TabsContent value="scanpath">
-                                        <div className="mt-2">
-                                            {/* NOTE: Smaller image size for history items */}
-                                            <img src={report.scanpath_path} alt="Scanpath" className="w-full max-w-[240px] rounded border" />
-                                        </div>
+                                        <div className="mt-2"><img src={report.scanpath_path} alt="Scanpath" className="w-full max-w-[240px] rounded border" /></div>
+                                    </TabsContent>
+                                )}
+                                {report.heatmap_path && (
+                                    <TabsContent value="heatmap">
+                                        <div className="mt-2"><img src={report.heatmap_path} alt="Heatmap" className="w-full max-w-[240px] rounded border" /></div>
                                     </TabsContent>
                                 )}
                                 {report.gaze_data && (
                                     <TabsContent value="gaze">
-                                        <div className="mt-2">
-                                            <pre className="text-xs bg-muted/50 p-2 rounded overflow-auto max-h-40">{JSON.stringify(report.gaze_data, null, 2)}</pre>
-                                        </div>
+                                        <div className="mt-2"><pre className="text-xs bg-muted/50 p-2 rounded overflow-auto max-h-40">{JSON.stringify(report.gaze_data, null, 2)}</pre></div>
                                     </TabsContent>
                                 )}
                             </Tabs>
@@ -408,12 +344,15 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
               </CardContent>
             </Card>
           </div>
-        </ScrollArea>
+        </div>
 
-        <div className="flex justify-end pt-4 mt-2 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
+        {/* --- FIX: Make footer sticky and add padding/styling --- */}
+        <div className="sticky bottom-0 z-10 bg-background px-6 pb-6 pt-4 border-t">
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
