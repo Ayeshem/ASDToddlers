@@ -22,6 +22,7 @@ import StimuliLibrary from "./pages/stimuli/StimuliLibrary";
 import ViewStimuliLibrary from "./pages/stimuli/ViewStimuliLibrary";
 import GazeSession from "./pages/session/GazeSession";
 import AppointmentScheduler from "./pages/appointments/AppointmentScheduler";
+import ViewAppointment from "./pages/appointments/ViewAppointment";
 
 // Other pages
 import Unauthorized from "./pages/Unauthorized";
@@ -182,8 +183,17 @@ function AppRoutes() {
       <Route
         path="/appointments"
         element={
-          <ProtectedRoute allowedRoles={['parent', 'doctor', 'admin']}>
+          <ProtectedRoute allowedRoles={['parent']}>
             <AppointmentScheduler />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/view-appointments"
+        element={
+          <ProtectedRoute allowedRoles={['doctor', 'admin']}>
+            <ViewAppointment />
           </ProtectedRoute>
         }
       />

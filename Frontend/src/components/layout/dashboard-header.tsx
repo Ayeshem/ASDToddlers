@@ -28,27 +28,28 @@ export function DashboardHeader() {
   };
 
   const getNavItems = () => {
-    const baseItems = [
-      { to: "/appointments", label: "Appointments", icon: Calendar },
-    ];
+    const baseItems = [];
 
     switch (user?.role) {
       case 'parent':
         return [
           { to: "/parent-dashboard", label: "Dashboard", icon: Home },
           { to: "/view-stimuli-library", label: "Stimuli", icon: Video },
+          { to: "/appointments", label: "Appointments", icon: Calendar },
           ...baseItems,
         ];
       case 'doctor':
         return [
           { to: "/doctor-dashboard", label: "Dashboard", icon: Home },
           { to: "/stimuli-library", label: "Stimuli", icon: Video },
+          { to: "/view-appointments", label: "Appointments", icon: Video },
           ...baseItems,
         ];
       case 'admin':
         return [
           { to: "/admin-dashboard", label: "Dashboard", icon: Home },
           { to: "/view-stimuli-library", label: "Stimuli", icon: Video },
+          { to: "/view-appointments", label: "Appointments", icon: Video },
           ...baseItems,
         ];
       default:
