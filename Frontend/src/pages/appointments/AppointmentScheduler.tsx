@@ -450,6 +450,7 @@ export default function AppointmentScheduler() {
                       <p className="font-medium">{appointment.time}</p>
                       <p className="text-sm text-muted-foreground">{getChildName(appointment.childId)}</p>
                       <p className="text-sm text-muted-foreground">{getDoctorName(appointment.doctorId)}</p>
+                      <p className="text-sm text-muted-foreground">{format(new Date(appointment.date), 'MMMM dd, yyyy')}</p>
                     </div>
                   ))}
               </div>
