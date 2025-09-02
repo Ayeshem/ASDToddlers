@@ -24,6 +24,14 @@ import GazeSession from "./pages/session/GazeSession";
 import AppointmentScheduler from "./pages/appointments/AppointmentScheduler";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
 
+
+import { AssessmentsTab } from "./components/admin/AssessmentsTab";
+import { DoctorDetailsModal } from "./components/admin/DoctorDetailsModal";
+import { DoctorManagementTab } from "./components/admin/DoctorManagementTab";
+import { StimuliManagementTab } from "./components/admin/StimuliManagementTab";
+import { SystemLogsTab } from "./components/admin/SystemLogsTab";
+import { SystemTab } from "./components/admin/SystemTab";
+
 // Other pages
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
@@ -197,6 +205,52 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/view-assessments"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AssessmentsTab />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/view-doctors"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <DoctorManagementTab />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/stimuli-management"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <StimuliManagementTab />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/system"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <SystemTab />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/system-logs"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <SystemLogsTab />
+          </ProtectedRoute>
+        }
+      />
+
 
       {/* Catch all */}
       <Route path="*" element={<NotFound />} />

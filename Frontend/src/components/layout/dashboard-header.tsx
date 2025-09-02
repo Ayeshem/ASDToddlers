@@ -147,7 +147,8 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 // Icons - Added Eye icon
 import {
   LogOut, User, Home, Settings, Calendar, Video, BarChart3,
-  Users, Loader2, Menu, Eye, // Changed BrainCircuit to Eye
+  Users, Loader2, Menu, Eye, FileText,
+  Paperclip, // Changed BrainCircuit to Eye
 } from "lucide-react";
 
 export function DashboardHeader() {
@@ -191,8 +192,14 @@ export function DashboardHeader() {
       case 'admin':
         return [
           { to: baseDashboardPath, label: "Dashboard", icon: Home },
-          { to: "/manage-users", label: "Manage Users", icon: Users },
-          { to: "/system-settings", label: "Settings", icon: Settings },
+          { to: "/view-doctors", label: "Doctors", icon: User },
+          { to: "/view-assessments", label: "Assessments", icon: Paperclip },
+          { to: "/stimuli-management", label: "Stimuli", icon: Video },
+          { to: "/view-appointments", label: "Appointments", icon: Calendar },
+          { to: "/system", label: "System", icon: Settings },
+          // { to: "/system-logs", label: "System Logs", icon: FileText },
+          // { to: "/manage-users", label: "Manage Users", icon: Users },
+          // { to: "/system-settings", label: "Settings", icon: Settings },
         ];
       default: return [];
     }

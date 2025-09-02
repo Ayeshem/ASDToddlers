@@ -203,16 +203,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-
-// Development mode: Auto-login as admin for easier testing
-// Only run this after the store is properly initialized
-if (import.meta.env.DEV && typeof window !== 'undefined') {
-  // Wait for the store to be ready
-  setTimeout(() => {
-    const authStore = useAuthStore.getState();
-    if (!authStore.isAuthenticated) {
-      // Auto-login as admin for development (remove this in production)
-      authStore.login('admin@gmail.com', 'Admin@123', 'admin');
-    }
-  }, 500);
-}

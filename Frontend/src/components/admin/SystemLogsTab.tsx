@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,38 +43,40 @@ export function SystemLogsTab() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>System Logs</CardTitle>
-          <Button variant="outline" size="sm" onClick={handleClearLogs}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Logs
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {systemLogs.map((log) => (
-            <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex-1">
-                <div className="font-medium">{log.message}</div>
-                <div className="text-sm text-muted-foreground">
-                  {new Date(log.timestamp).toLocaleString()}
+    <DashboardLayout>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>System Logs</CardTitle>
+            <Button variant="outline" size="sm" onClick={handleClearLogs}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Logs
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {systemLogs.map((log) => (
+              <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex-1">
+                  <div className="font-medium">{log.message}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {new Date(log.timestamp).toLocaleString()}
+                  </div>
                 </div>
+                <Badge 
+                  variant={
+                    log.level === 'info' ? 'default' :
+                    log.level === 'warning' ? 'secondary' : 'destructive'
+                  }
+                >
+                  {log.level}
+                </Badge>
               </div>
-              <Badge 
-                variant={
-                  log.level === 'info' ? 'default' :
-                  log.level === 'warning' ? 'secondary' : 'destructive'
-                }
-              >
-                {log.level}
-              </Badge>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </DashboardLayout>
   );
 }

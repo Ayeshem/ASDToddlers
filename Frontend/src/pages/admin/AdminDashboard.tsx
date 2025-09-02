@@ -3,30 +3,25 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi, type SystemStats } from "@/services/adminApi";
-import { 
-  Users, Activity, Database, Settings, Download, BarChart3, Video, RefreshCw, AlertTriangle
+import {
+  Users, Activity, Settings, Download, BarChart3, Video, RefreshCw, AlertTriangle, ShieldAlert
 } from "lucide-react";
 
 // Import tab components
-import { DoctorManagementTab } from "@/components/admin/DoctorManagementTab";
-import { StimuliManagementTab } from "@/components/admin/StimuliManagementTab";
 import { OverviewTab } from "@/components/admin/OverviewTab";
-import { AssessmentsTab } from "@/components/admin/AssessmentsTab";
-import { SystemTab } from "@/components/admin/SystemTab";
-import { SystemLogsTab } from "@/components/admin/SystemLogsTab";
 
 export default function AdminDashboard() {
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
+  const [isHighlighting, setIsHighlighting] = useState(false); // State for the new feature
   const [systemStats, setSystemStats] = useState<SystemStats>({
     totalUsers: 0,
     totalDoctors: 0,
     totalChildren: 0,
     totalAssessments: 0,
     totalStimuli: 0,
-    safeRiskCount: 0,     // added
+    safeRiskCount: 0,
     lowRiskCount: 0,
     moderateRiskCount: 0,
     highRiskCount: 0,
@@ -60,21 +55,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleSystemBackup = async () => {
-    toast({
-      title: "System backup initiated",
-      description: "Creating backup of all system data...",
-    });
-    
-    // Mock backup process for now - you can integrate with real backup API
-    setTimeout(() => {
-      toast({
-        title: "Backup completed",
-        description: "System backup has been completed successfully.",
-      });
-    }, 3000);
-  };
-
   const handleSystemMaintenance = async () => {
     const newMode = !isMaintenanceMode;
     setIsMaintenanceMode(newMode);
@@ -84,10 +64,15 @@ export default function AdminDashboard() {
       description: newMode ? "System is now in maintenance mode. Users will be notified." : "System is now operational.",
     });
   };
+  
+  // Handler for the new button
+  const handleToggleHighlight = () => {
+    setIsHighlighting(prevState => !prevState);
+  };
 
   const handleGenerateReport = async () => {
     try {
-      // Generate comprehensive system report with real data
+      // Generate comprehensive system report
       const report = `
 System Report - ${new Date().toLocaleDateString()}
 
@@ -110,7 +95,6 @@ Status: ${systemStats.systemHealth.toUpperCase()}
 Generated at: ${new Date().toISOString()}
       `.trim();
       
-      // Create a downloadable file
       const blob = new Blob([report], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -134,61 +118,62 @@ Generated at: ${new Date().toISOString()}
     }
   };
 
-  const getHealthColor = (health: string) => {
+  const getHealthStyling = (health: string) => {
     switch (health) {
-      case 'excellent': return 'text-green-600';
-      case 'good': return 'text-blue-600';
-      case 'warning': return 'text-yellow-600';
-      case 'critical': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'excellent': return { bg: 'bg-green-500/10', text: 'text-green-500', border: 'border-green-500/20' };
+      case 'good': return { bg: 'bg-blue-500/10', text: 'text-blue-500', border: 'border-blue-500/20' };
+      case 'warning': return { bg: 'bg-yellow-500/10', text: 'text-yellow-500', border: 'border-yellow-500/20' };
+      case 'critical': return { bg: 'bg-red-500/10', text: 'text-red-600', border: 'border-red-500/20' };
+      default: return { bg: 'bg-slate-500/10', text: 'text-slate-500', border: 'border-slate-500/20' };
     }
   };
 
+  const healthStyle = getHealthStyling(systemStats.systemHealth);
+
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Comprehensive system administration and monitoring</p>
+            <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+            <p className="text-muted-foreground">System administration and monitoring.</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <Button variant="outline" onClick={fetchDashboardData} disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button variant="outline" onClick={handleSystemBackup}>
-              <Database className="h-4 w-4 mr-2" />
-              Backup System
+            {/* New Button replacing Backup */}
+            <Button
+              variant={isHighlighting ? "destructive" : "secondary"}
+              onClick={handleToggleHighlight}
+            >
+              <ShieldAlert className="h-4 w-4 mr-2" />
+              {isHighlighting ? "Stop Highlighting" : "Highlight Risks"}
             </Button>
-            <Button 
-              variant={isMaintenanceMode ? "destructive" : "outline"} 
+            <Button
+              variant={isMaintenanceMode ? "destructive" : "secondary"}
               onClick={handleSystemMaintenance}
             >
               <Settings className="h-4 w-4 mr-2" />
-              {isMaintenanceMode ? 'Disable Maintenance' : 'Maintenance Mode'}
+              {isMaintenanceMode ? 'End Maintenance' : 'Maintenance'}
             </Button>
-            <Button variant="outline" onClick={handleGenerateReport}>
+            <Button variant="secondary" onClick={handleGenerateReport}>
               <Download className="h-4 w-4 mr-2" />
-              Generate Report
+              Report
             </Button>
           </div>
         </div>
 
         {/* Error State */}
         {error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive" />
-              <p className="text-destructive text-sm">{error}</p>
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <p className="text-destructive font-medium text-sm">{error}</p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={fetchDashboardData}
-              className="mt-2"
-            >
+            <Button variant="destructive" size="sm" onClick={fetchDashboardData}>
               Retry
             </Button>
           </div>
@@ -196,83 +181,81 @@ Generated at: ${new Date().toISOString()}
 
         {/* Statistics Cards */}
         {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="flex items-center justify-center py-8">
-                  <LoadingSpinner size="sm" />
-                </CardContent>
+              <Card key={i} className="p-6">
+                <div className="space-y-3 animate-pulse">
+                    <div className="h-5 w-3/5 rounded bg-muted"></div>
+                    <div className="h-8 w-2/5 rounded bg-muted"></div>
+                    <div className="h-4 w-4/5 rounded bg-muted"></div>
+                </div>
               </Card>
             ))}
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-4">
-            <Card>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="transition-all hover:shadow-md hover:-translate-y-1">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Children</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{systemStats.totalChildren}</div>
-                <p className="text-xs text-muted-foreground">
-                  Registered patients
-                </p>
+                <p className="text-xs text-muted-foreground">Registered patients</p>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="transition-all hover:shadow-md hover:-translate-y-1">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Doctors</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{systemStats.totalDoctors}</div>
-                <p className="text-xs text-muted-foreground">
-                  Healthcare professionals
-                </p>
+                <p className="text-xs text-muted-foreground">Healthcare professionals</p>
               </CardContent>
             </Card>
             
-            <Card>
+            {/* --- MODIFIED CARD FOR HIGHLIGHTING --- */}
+            <Card className={`
+              transition-all hover:shadow-md hover:-translate-y-1 
+              ${isHighlighting ? 'border-destructive/50 bg-destructive/10' : ''}
+            `}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Assessments</CardTitle>
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{systemStats.totalAssessments}</div>
-                <p className="text-xs text-muted-foreground">
+                <p className={`
+                  transition-colors 
+                  ${isHighlighting ? 'text-destructive font-bold' : 'text-xs text-muted-foreground'}
+                `}>
                   {systemStats.highRiskCount} high risk cases
                 </p>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="transition-all hover:shadow-md hover:-translate-y-1">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Stimuli Library</CardTitle>
                 <Video className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{systemStats.totalStimuli}</div>
-                <p className="text-xs text-muted-foreground">
-                  Video stimuli available
-                </p>
+                <p className="text-xs text-muted-foreground">Video stimuli available</p>
               </CardContent>
             </Card>
           </div>
         )}
 
         {/* System Health Banner */}
-        <Card className={`border-l-4 ${
-          systemStats.systemHealth === 'excellent' ? 'border-l-green-500 bg-green-50' :
-          systemStats.systemHealth === 'good' ? 'border-l-blue-500 bg-blue-50' :
-          systemStats.systemHealth === 'warning' ? 'border-l-yellow-500 bg-yellow-50' :
-          'border-l-red-500 bg-red-50'
-        }`}>
-          <CardContent className="py-4">
+        <Card className={`${healthStyle.bg} border ${healthStyle.border} shadow-none`}>
+          <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <Activity className={`h-5 w-5 ${getHealthColor(systemStats.systemHealth)}`} />
+              <Activity className={`h-5 w-5 ${healthStyle.text}`} />
               <div>
-                <div className="font-medium">System Health: <span className={getHealthColor(systemStats.systemHealth)}>{systemStats.systemHealth.toUpperCase()}</span></div>
+                <div className="font-medium">Health: <span className={`font-bold ${healthStyle.text}`}>{systemStats.systemHealth.toUpperCase()}</span></div>
                 <div className="text-sm text-muted-foreground">
                   {systemStats.totalUsers} total users • {systemStats.totalAssessments} assessments completed
                 </div>
@@ -281,39 +264,14 @@ Generated at: ${new Date().toISOString()}
           </CardContent>
         </Card>
 
-        {/* Main Content Tabs */}
+        {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="doctors">Doctor Management</TabsTrigger>
-            <TabsTrigger value="stimuli">Stimuli Management</TabsTrigger>
-            <TabsTrigger value="assessments">Assessments</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
-            <TabsTrigger value="logs">System Logs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
             <OverviewTab />
-          </TabsContent>
-
-          <TabsContent value="doctors">
-            <DoctorManagementTab />
-          </TabsContent>
-
-          <TabsContent value="stimuli">
-            <StimuliManagementTab />
-          </TabsContent>
-
-          <TabsContent value="assessments">
-            <AssessmentsTab />
-          </TabsContent>
-
-          <TabsContent value="system">
-            <SystemTab />
-          </TabsContent>
-
-          <TabsContent value="logs">
-            <SystemLogsTab />
           </TabsContent>
         </Tabs>
       </div>

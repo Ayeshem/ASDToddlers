@@ -1898,6 +1898,57 @@ def count_high_risk():
     return jsonify({"risk_level": "High", "count": count})
 
 
+
+# ========================================================================
+# === 👇 NEW API ENDPOINT FOR SYSTEM STATUS 👇 ===
+# ========================================================================
+
+@app.route('/api/system-status', methods=['GET'])
+def get_system_status():
+    """
+    Provides a live status check of the application's core components.
+    """
+    services = []
+
+    # 1. Check Database Connection
+    try:
+        # A simple query to check if the DB is responsive.
+        db.session.query(User).first()
+        db_status = "Operational"
+    except Exception as e:
+        print(f"Database connection error: {e}")
+        db_status = "Offline"
+    services.append({"id": "db", "name": "Database Connection", "status": db_status})
+
+    # 2. Check ML Model Service (Gaze Session Status)
+    global session_thread
+    if session_thread and session_thread.is_alive():
+        ml_status = "Degraded" # Using "Degraded" to signify it's busy/in-use
+    else:
+        ml_status = "Operational" # Ready for a new session
+    services.append({"id": "ml", "name": "ML Model Service", "status": ml_status})
+
+    # 3. Check File Storage (S3) - Checks if the upload directory exists
+    if os.path.exists(app.config['UPLOAD_FOLDER']) and os.path.isdir(app.config['UPLOAD_FOLDER']):
+        storage_status = "Operational"
+    else:
+        storage_status = "Offline"
+    services.append({"id": "storage", "name": "File Storage", "status": storage_status})
+    
+    # 4. Public API Gateway (Static Check)
+    # This is usually a check against an external service, but we'll assume it's okay if the app is running.
+    services.append({"id": "api", "name": "Public API Gateway", "status": "Operational"})
+
+    # 5. System Load (placeholder logic)
+    # For a real app, you might check CPU/memory usage. Here, it's a placeholder.
+    services.append({"id": "load", "name": "System Load", "status": "Normal"})
+    
+    return jsonify(services)
+
+# ========================================================================
+
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))  # Use port 8000 as default to avoid conflicts
     app.run(debug=True, host='0.0.0.0', port=port, use_reloader=False)

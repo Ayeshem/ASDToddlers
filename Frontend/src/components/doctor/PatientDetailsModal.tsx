@@ -148,7 +148,7 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       {/* --- FIX: Make the dialog scrollable, remove padding and flex layout --- */}
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
         {/* --- FIX: Make header sticky and add padding/styling --- */}
         <DialogHeader className="sticky top-0 z-10 bg-background px-6 pt-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2">
