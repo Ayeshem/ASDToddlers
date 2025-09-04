@@ -231,8 +231,8 @@ export function DashboardHeader() {
                   className={cn(
                     "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     // Adjusted text and hover colors for the new background
-                    "text-slate-300 hover:bg-slate-700 hover:text-white",
-                    isActive && "bg-slate-700 text-sky-100"
+                    "text-slate-300 hover:bg-slate-600 hover:text-white",
+                    isActive && "bg-slate-600 text-sky-100"
                   )}
                 >
                   <item.icon className="h-4 w-4" />
@@ -316,4 +316,3 @@ export function DashboardHeader() {
     </header>
   );
 }
-
