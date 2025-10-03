@@ -148,7 +148,7 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import {
   LogOut, User, Home, Settings, Calendar, Video, BarChart3,
   Users, Loader2, Menu, Eye, FileText,
-  Paperclip, // Changed BrainCircuit to Eye
+  Paperclip, HelpCircle // Changed BrainCircuit to Eye
 } from "lucide-react";
 
 export function DashboardHeader() {
@@ -182,6 +182,7 @@ export function DashboardHeader() {
           { to: baseDashboardPath, label: "Dashboard", icon: Home },
           { to: "/view-stimuli-library", label: "Stimuli Library", icon: Video },
           { to: "/appointments", label: "Appointments", icon: Calendar },
+          { to: "/getting-started", label: "Quick Start", icon: HelpCircle },
         ];
       case 'doctor':
         return [

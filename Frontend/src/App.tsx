@@ -23,6 +23,7 @@ import ViewStimuliLibrary from "./pages/stimuli/ViewStimuliLibrary";
 import GazeSession from "./pages/session/GazeSession";
 import AppointmentScheduler from "./pages/appointments/AppointmentScheduler";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
+import InstructionsPage from "./pages/QuickStart/InstructionsPage";
 
 
 import { AssessmentsTab } from "./components/admin/AssessmentsTab";
@@ -115,6 +116,16 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/getting-started"
+        element={
+          <ProtectedRoute allowedRoles={['parent']}>
+            <InstructionsPage />
+          </ProtectedRoute>
+        }
+      />
+
 
       <Route
         path="/doctor-dashboard"
