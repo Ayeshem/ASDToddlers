@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Appointment } from '@/types';
 import axios from 'axios';
+import { format, parseISO } from 'date-fns';
 
 interface AppointmentState {
   appointments: Appointment[];
@@ -24,7 +25,8 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
           parentId: appt.parent_id,
           doctorId: appt.doctor_id,
           childId: appt.child_id,
-          date: appt.date,
+          // normalize to yyyy-MM-dd
+          date: format(parseISO(appt.date), 'yyyy-MM-dd'),
           time: appt.time,
           status: appt.status,
           notes: appt.notes || '',
@@ -36,6 +38,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     }
   },
 
+  // Add new appointment and update local state immediately
   addAppointment: async (appointment) => {
     const payload = {
       parent_id: appointment.parentId,
@@ -44,6 +47,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
       date: appointment.date,
       time: appointment.time,
       notes: appointment.notes || '',
+      status: appointment.status || 'scheduled',
     };
 
     try {
@@ -52,6 +56,9 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
         const newAppointment: Appointment = {
           ...appointment,
           id: response.data.appointment_id.toString(),
+          // normalize date to yyyy-MM-dd
+          date: format(parseISO(appointment.date), 'yyyy-MM-dd'),
+          status: appointment.status || 'scheduled',
         };
         set((state) => ({
           appointments: [...state.appointments, newAppointment],
@@ -64,6 +71,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     }
   },
 
+  // Update appointment and sync with local state
   updateAppointment: async (id, updates) => {
     const payload = {
       parent_id: updates.parentId,
@@ -78,7 +86,14 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
       await axios.put(`http://127.0.0.1:8000/appointments/${id}`, payload);
       set((state) => ({
         appointments: state.appointments.map((appt) =>
-          appt.id === id ? { ...appt, ...updates } : appt
+          appt.id === id
+            ? {
+                ...appt,
+                ...updates,
+                // normalize date if updated
+                date: updates.date ? format(parseISO(updates.date), 'yyyy-MM-dd') : appt.date,
+              }
+            : appt
         ),
       }));
     } catch (err) {
@@ -86,6 +101,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     }
   },
 
+  // Delete appointment and remove from local state
   deleteAppointment: async (id) => {
     try {
       await axios.delete(`http://127.0.0.1:8000/appointments/${id}`);
@@ -97,6 +113,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     }
   },
 
+  // Get appointments by normalized date
   getAppointmentsByDate: (date) => {
     return get().appointments.filter((appt) => appt.date === date);
   },

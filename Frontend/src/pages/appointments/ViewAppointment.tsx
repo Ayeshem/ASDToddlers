@@ -131,13 +131,17 @@ export default function AppointmentScheduler() {
   };
 
   const processedAppointments = useMemo(() => {
-    const filteredByDate = getAppointmentsByDate(format(selectedDate, 'yyyy-MM-dd'));
+    const filteredByDate = appointments.filter(
+      (apt) => apt.date === format(selectedDate, 'yyyy-MM-dd')
+    );
+  
     return filteredByDate.filter(apt => 
       getChildName(apt.childId).toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
       getDoctorName(apt.doctorId).toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
       apt.notes?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     ).sort((a, b) => a.time.localeCompare(b.time));
-  }, [getAppointmentsByDate, selectedDate, debouncedSearchQuery, children, doctors]);
+  }, [appointments, selectedDate, debouncedSearchQuery, children, doctors]);
+
   
   const renderScheduleContent = () => {
     if (processedAppointments.length === 0) {
