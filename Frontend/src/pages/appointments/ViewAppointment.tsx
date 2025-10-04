@@ -154,11 +154,6 @@ export default function AppointmentScheduler() {
               : "No appointments scheduled for this day."
             }
           </p>
-          {!debouncedSearchQuery && (
-            <Button variant="outline" className="mt-3" onClick={() => setShowScheduleModal(true)}>
-              Schedule Appointment
-            </Button>
-          )}
         </div>
       );
     }
@@ -258,10 +253,6 @@ export default function AppointmentScheduler() {
                 </Button>
                 <Dialog open={showScheduleModal} onOpenChange={setShowScheduleModal}>
                   <DialogTrigger asChild>
-                    {/* <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Schedule Appointment
-                    </Button> */}
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
