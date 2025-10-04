@@ -4,10 +4,8 @@ import {
   Loader2,
   FileText,
   Users,
-  FileVideo,
   Calendar,
   Zap,
-  CornerDownRight,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -80,28 +78,36 @@ export default function UserGuidePage() {
       title: "Manage Children",
       description:
         "Add and manage profiles. Each child keeps their own session history and reports for focused tracking.",
-      color: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+      // New color classes for the card body and border
+      cardColor: "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800",
+      iconColor: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
     },
     {
       icon: Play,
       title: "Start Session",
       description:
         "Quickly begin a new eye-tracking session for your selected child profile.",
-      color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+      // New color classes for the card body and border
+      cardColor: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
+      iconColor: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
     },
     {
       icon: FileText,
       title: "View All Reports",
       description:
         "Access all past reports in one place. Easily track progress, compare results, and share them with a specialist.",
-      color: "bg-green-500/10 text-green-600 dark:text-green-400",
+      // New color classes for the card body and border
+      cardColor: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
+      iconColor: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
     },
     {
       icon: Calendar,
       title: "Book Appointments",
       description:
         "Easily book an appointment with certified doctors directly through the app to discuss your child’s progress and results.",
-      color: "bg-red-500/10 text-red-600 dark:text-red-400",
+      // New color classes for the card body and border
+      cardColor: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
+      iconColor: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
     },
   ];
 
@@ -109,7 +115,7 @@ export default function UserGuidePage() {
     <DashboardLayout>
       <div className="space-y-6 pb-12"> 
         
-        {/* Key Features Card */}
+        {/* Key Features Card - The main container remains clean */}
         <Card className="shadow-xl border border-gray-200 dark:border-gray-800">
           <CardContent className="p-6 md:p-8 space-y-10">
             <section className="space-y-6">
@@ -120,11 +126,13 @@ export default function UserGuidePage() {
                 {dashboardFeatures.map((feature, index) => (
                   <Card
                     key={index}
-                    className="shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all duration-300 hover:scale-[1.01]"
+                    // APPLYING THE COLOR TO THE CARD HERE!
+                    className={`shadow-lg border ${feature.cardColor} hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
                   >
                     <CardHeader className="flex flex-col space-y-3 p-5">
                       <div
-                        className={`h-10 w-10 rounded-full flex items-center justify-center ${feature.color} border border-transparent`}
+                        // APPLYING THE ICON COLOR HERE!
+                        className={`h-10 w-10 rounded-xl flex items-center justify-center ${feature.iconColor} shadow-inner`}
                       >
                         <feature.icon className="h-5 w-5" />
                       </div>

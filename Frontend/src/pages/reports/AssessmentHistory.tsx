@@ -238,7 +238,7 @@ export default function ChildHistoryPage() {
                 <div>
                   {/* Title */}
                   <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-                    <FileText className="h-6 w-6 text-primary" /> Child History
+                    Child History
                   </h1>
                   
                   {/* Subtitle/Details */}
