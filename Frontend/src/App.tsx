@@ -23,7 +23,7 @@ import ViewStimuliLibrary from "./pages/stimuli/ViewStimuliLibrary";
 import GazeSession from "./pages/session/GazeSession";
 import AppointmentScheduler from "./pages/appointments/AppointmentScheduler";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
-import InstructionsPage from "./pages/QuickStart/InstructionsPage";
+import UserGuidePage from "./pages/UserGuide/UserGuidePage";
 
 
 import { AssessmentsTab } from "./components/admin/AssessmentsTab";
@@ -118,10 +118,10 @@ function AppRoutes() {
       />
 
       <Route
-        path="/getting-started"
+        path="/user-guide"
         element={
           <ProtectedRoute allowedRoles={['parent']}>
-            <InstructionsPage />
+            <UserGuidePage />
           </ProtectedRoute>
         }
       />

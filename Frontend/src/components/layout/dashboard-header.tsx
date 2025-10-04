@@ -182,7 +182,7 @@ export function DashboardHeader() {
           { to: baseDashboardPath, label: "Dashboard", icon: Home },
           { to: "/view-stimuli-library", label: "Stimuli Library", icon: Video },
           { to: "/appointments", label: "Appointments", icon: Calendar },
-          { to: "/getting-started", label: "Quick Start", icon: HelpCircle },
+          { to: "/user-guide", label: "User Guide", icon: HelpCircle },
         ];
       case 'doctor':
         return [
