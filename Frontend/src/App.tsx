@@ -23,7 +23,7 @@ import ViewStimuliLibrary from "./pages/stimuli/ViewStimuliLibrary";
 import GazeSession from "./pages/session/GazeSession";
 import AppointmentScheduler from "./pages/appointments/AppointmentScheduler";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
-import UserGuidePage from "./pages/UserGuide/UserGuidePage";
+import UserGuidePage from "./pages/userguide/UserGuidePage";
 
 
 import { AssessmentsTab } from "./components/admin/AssessmentsTab";

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { doctorPatientApi, type Child as APIChild, type Report as APIReport } from "@/services/doctorPatientApi";
 import { 
@@ -114,11 +113,16 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
 
   const getRiskBadgeVariant = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
-      case 'safe': return 'outline';
-      case 'low': return 'default';
-      case 'moderate': return 'secondary';
-      case 'high': return 'destructive';
-      default: return 'outline';
+      case "safe":
+        return "default"; // fallback variant (we override with green via className)
+      case "low":
+        return "default";
+      case "moderate":
+        return "secondary";
+      case "high":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
@@ -147,9 +151,7 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      {/* --- FIX: Make the dialog scrollable, remove padding and flex layout --- */}
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
-        {/* --- FIX: Make header sticky and add padding/styling --- */}
         <DialogHeader className="sticky top-0 z-10 bg-background px-6 pt-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
@@ -157,7 +159,6 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
           </DialogTitle>
         </DialogHeader>
 
-        {/* --- FIX: Add padding to the main content area --- */}
         <div className="px-6">
           <div className="space-y-6 my-6">
             <Card>
@@ -210,8 +211,17 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <p className="text-sm font-medium text-muted-foreground">Risk Level</p>
-                      <Badge variant={getRiskBadgeVariant(latestReport.risk_level)} className="text-md font-semibold">
-                        {latestReport.risk_level.toLowerCase() === 'safe' ? 'Safe' : `${latestReport.risk_level} Risk`}
+                      <Badge
+                        variant={getRiskBadgeVariant(latestReport.risk_level)}
+                        className={
+                          latestReport.risk_level.toLowerCase() === "safe"
+                            ? "bg-green-500 text-white hover:bg-green-600"
+                            : ""
+                        }
+                      >
+                        {latestReport.risk_level.toLowerCase() === "safe"
+                          ? "Safe"
+                          : `${latestReport.risk_level} Risk`}
                       </Badge>
                     </div>
                     <div className="space-y-4">
@@ -310,8 +320,17 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                         <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
-                              <Badge variant={getRiskBadgeVariant(report.risk_level)}>
-                                {report.risk_level.toLowerCase() === 'safe' ? 'Safe' : `${report.risk_level} Risk`}
+                              <Badge
+                                variant={getRiskBadgeVariant(report.risk_level)}
+                                className={
+                                  report.risk_level.toLowerCase() === "safe"
+                                    ? "bg-green-500 text-white hover:bg-green-600"
+                                    : ""
+                                }
+                              >
+                                {report.risk_level.toLowerCase() === "safe"
+                                  ? "Safe"
+                                  : `${report.risk_level} Risk`}
                               </Badge>
                               <span className="font-medium">{report.predicted_class}</span>
                             </div>
@@ -358,7 +377,6 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
           </div>
         </div>
 
-        {/* --- FIX: Make footer sticky and add padding/styling --- */}
         <div className="sticky bottom-0 z-10 bg-background px-6 pb-6 pt-4 border-t">
           <div className="flex justify-end">
             <Button variant="outline" onClick={onClose}>
