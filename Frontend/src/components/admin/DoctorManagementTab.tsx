@@ -323,34 +323,47 @@ export function DoctorManagementTab() {
       <div className="space-y-6">
         {/* Doctor Stats Cards - These are already consistent */}
         <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Doctors</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{doctors.length}</div>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Doctors</CardTitle>
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold text-green-600">{doctors.filter(d => d.status === 'active').length}</div>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Specializations</CardTitle>
-                    <Briefcase className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{new Set(doctors.map(d => d.specialization)).size}</div>
-                </CardContent>
-            </Card>
-        </div>
+        {/* Total Doctors */}
+        <Card className="bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors rounded-2xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-semibold text-blue-900">Total Doctors</CardTitle>
+            <Users className="h-5 w-5 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-blue-700">{doctors.length}</div>
+            <p className="text-xs text-blue-800/70 mt-1">All registered medical professionals</p>
+          </CardContent>
+        </Card>
+
+        {/* Active Doctors */}
+        <Card className="bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors rounded-2xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-semibold text-emerald-900">Active Doctors</CardTitle>
+            <CheckCircle className="h-5 w-5 text-emerald-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-emerald-700">
+              {doctors.filter((d) => d.status === "active").length}
+            </div>
+            <p className="text-xs text-emerald-800/70 mt-1">Currently active in the system</p>
+          </CardContent>
+        </Card>
+
+        {/* Specializations */}
+        <Card className="bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors rounded-2xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-semibold text-purple-900">Specializations</CardTitle>
+            <Briefcase className="h-5 w-5 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-purple-700">
+              {new Set(doctors.map((d) => d.specialization)).size}
+            </div>
+            <p className="text-xs text-purple-800/70 mt-1">Unique medical fields</p>
+          </CardContent>
+        </Card>
+      </div>
+
 
         <Card>
             <CardHeader>

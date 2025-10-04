@@ -573,25 +573,6 @@ export function DoctorDetailsModal({ doctor, isOpen, onClose }: DoctorDetailsMod
     }
   };
 
-  const handleToggleStatus = async () => {
-    if (!doctor) return;
-
-    try {
-      await adminApi.toggleDoctorStatus(doctor.id);
-      toast({
-        title: "Status Updated",
-        description: `Dr. ${doctor.full_name}'s status has been updated.`,
-      });
-      await fetchDoctorData();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update doctor status",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (!doctor) return null;
 
   return (
@@ -622,9 +603,6 @@ export function DoctorDetailsModal({ doctor, isOpen, onClose }: DoctorDetailsMod
                         <><Clock className="h-3 w-3 mr-1" /> Inactive</>
                       )}
                     </Badge>
-                    <Button size="sm" variant="outline" onClick={handleToggleStatus}>
-                      Toggle Status
-                    </Button>
                   </div>
                 </div>
               </CardHeader>
@@ -760,10 +738,15 @@ export function DoctorDetailsModal({ doctor, isOpen, onClose }: DoctorDetailsMod
 
             {/* Detailed Tabs */}
             <Tabs defaultValue="assessments" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="assessments">Recent Assessments</TabsTrigger>
-                <TabsTrigger value="patients">Patient Overview</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="assessments" className="text-sm font-medium">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Recent Assessments
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="text-sm font-medium">
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Analytics
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="assessments" className="space-y-4">
@@ -824,12 +807,6 @@ export function DoctorDetailsModal({ doctor, isOpen, onClose }: DoctorDetailsMod
 
               <TabsContent value="patients" className="space-y-4">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      Patient Overview
-                    </CardTitle>
-                  </CardHeader>
                   <CardContent>
                     <div className="text-center py-8 text-muted-foreground">
                       <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />

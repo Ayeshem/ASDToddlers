@@ -280,40 +280,59 @@ function StimuliStatistics({ stimuli }: { stimuli: StimuliVideo[] }) {
     }, {} as Record<string, number>);
   }, [stimuli]);
 
-  const totalDuration = useMemo(() => {
-    const totalSeconds = stimuli.reduce((acc, s) => acc + (s.duration || 0), 0);
-    return Math.floor(totalSeconds / 60);
+  // Convert total duration (seconds) → hours + minutes
+  const totalDurationDisplay = useMemo(() => {
+    const totalSeconds = stimuli.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    if (hours === 0 && minutes === 0) return "0 minutes";
+    if (hours === 0) return `${minutes} minutes`;
+    if (minutes === 0) return `${hours} hours`;
+    return `${hours} hours ${minutes} minutes`;
   }, [stimuli]);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Videos</CardTitle>
-                <Video className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{stimuli.length}</div>
-            </CardContent>
-        </Card>
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Unique Categories</CardTitle>
-                <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{Object.keys(categoryCounts).length}</div>
-            </CardContent>
-        </Card>
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Duration (Minutes)</CardTitle>
-                <List className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{totalDuration}</div>
-            </CardContent>
-        </Card>
+      {/* Total Videos */}
+      <Card className="bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors rounded-2xl shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-semibold text-blue-900">Total Videos</CardTitle>
+          <Video className="h-5 w-5 text-blue-600" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-blue-700">{stimuli.length}</div>
+          <p className="text-xs text-blue-800/70 mt-1">Videos in the library</p>
+        </CardContent>
+      </Card>
+
+      {/* Unique Categories */}
+      <Card className="bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors rounded-2xl shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-semibold text-emerald-900">Unique Categories</CardTitle>
+          <LayoutGrid className="h-5 w-5 text-emerald-600" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-emerald-700">
+            {Object.keys(categoryCounts).length}
+          </div>
+          <p className="text-xs text-emerald-800/70 mt-1">Different types of stimuli</p>
+        </CardContent>
+      </Card>
+
+      {/* Total Duration */}
+      <Card className="bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors rounded-2xl shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-semibold text-purple-900">
+            Total Duration
+          </CardTitle>
+          <List className="h-5 w-5 text-purple-600" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-purple-700">{totalDurationDisplay}</div>
+          <p className="text-xs text-purple-800/70 mt-1">Combined video length</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
