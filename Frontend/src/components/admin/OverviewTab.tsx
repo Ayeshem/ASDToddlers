@@ -3,13 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Button } from "@/components/ui/button";
-import { adminApi, type GazeResult, type Child } from "@/services/adminApi";
+import { adminApi, type GazeResult } from "@/services/adminApi";
 import { AssessmentResultModal } from "./AssessmentResultModal";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, AlertTriangle, TrendingUp, Users, Activity, Eye } from "lucide-react";
+import { RefreshCw, AlertTriangle, TrendingUp, Activity, Users, Eye } from "lucide-react";
 import { format, parseISO } from "date-fns";
-
-
 
 export function OverviewTab() {
   const [recentReports, setRecentReports] = useState<(GazeResult & { childName?: string })[]>([]);
@@ -42,24 +40,23 @@ export function OverviewTab() {
         adminApi.getHighRiskCount()
       ]);
 
-      if (recentReportsData.status === 'fulfilled') {
+      if (recentReportsData.status === "fulfilled") {
         setRecentReports(recentReportsData.value);
       }
 
       setRiskStats({
-        safe: safeRisk.status === 'fulfilled' ? safeRisk.value.count : 0,
-        low: lowRisk.status === 'fulfilled' ? lowRisk.value.count : 0,
-        moderate: moderateRisk.status === 'fulfilled' ? moderateRisk.value.count : 0,
-        high: highRisk.status === 'fulfilled' ? highRisk.value.count : 0
+        safe: safeRisk.status === "fulfilled" ? safeRisk.value.count : 0,
+        low: lowRisk.status === "fulfilled" ? lowRisk.value.count : 0,
+        moderate: moderateRisk.status === "fulfilled" ? moderateRisk.value.count : 0,
+        high: highRisk.status === "fulfilled" ? highRisk.value.count : 0
       });
-
     } catch (error) {
-      console.error('Failed to fetch overview data:', error);
-      setError('Failed to load overview data');
+      console.error("Failed to fetch overview data:", error);
+      setError("Failed to load overview data");
       toast({
         title: "Error",
         description: "Failed to load overview data. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
@@ -83,15 +80,13 @@ export function OverviewTab() {
 
   if (error) {
     return (
-      <div className="space-y-4">
-        <div className="text-center py-12">
-          <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
-          <p className="text-red-600 mb-4">{error}</p>
-          <Button variant="outline" onClick={fetchOverviewData}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Try Again
-          </Button>
-        </div>
+      <div className="space-y-4 text-center py-12">
+        <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
+        <p className="text-red-600 mb-4">{error}</p>
+        <Button variant="outline" onClick={fetchOverviewData}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Try Again
+        </Button>
       </div>
     );
   }
@@ -119,44 +114,43 @@ export function OverviewTab() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 gap-4">
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-3xl font-bold text-emerald-600">
-                {riskStats.safe}
-              </div>
+            {/* Safe */}
+            <div className="text-center p-4 border rounded-lg bg-green-50 border-green-200 hover:bg-green-100 transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold text-emerald-700">{riskStats.safe}</div>
               <div className="text-sm text-muted-foreground">Safe</div>
               <div className="text-xs text-muted-foreground mt-1">
-                {totalAssessments > 0 ? `${((riskStats.safe / totalAssessments) * 100).toFixed(1)}%` : '0%'}
+                {totalAssessments > 0 ? `${((riskStats.safe / totalAssessments) * 100).toFixed(1)}%` : "0%"}
               </div>
             </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-3xl font-bold text-green-600">
-                {riskStats.low}
-              </div>
+
+            {/* Low */}
+            <div className="text-center p-4 border rounded-lg bg-cyan-50 border-cyan-200 hover:bg-cyan-100 transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold text-cyan-700">{riskStats.low}</div>
               <div className="text-sm text-muted-foreground">Low Risk</div>
               <div className="text-xs text-muted-foreground mt-1">
-                {totalAssessments > 0 ? `${((riskStats.low / totalAssessments) * 100).toFixed(1)}%` : '0%'}
+                {totalAssessments > 0 ? `${((riskStats.low / totalAssessments) * 100).toFixed(1)}%` : "0%"}
               </div>
             </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-3xl font-bold text-yellow-600">
-                {riskStats.moderate}
-              </div>
+
+            {/* Moderate */}
+            <div className="text-center p-4 border rounded-lg bg-yellow-50 border-yellow-200 hover:bg-yellow-100 transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold text-yellow-700">{riskStats.moderate}</div>
               <div className="text-sm text-muted-foreground">Moderate Risk</div>
               <div className="text-xs text-muted-foreground mt-1">
-                {totalAssessments > 0 ? `${((riskStats.moderate / totalAssessments) * 100).toFixed(1)}%` : '0%'}
+                {totalAssessments > 0 ? `${((riskStats.moderate / totalAssessments) * 100).toFixed(1)}%` : "0%"}
               </div>
             </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-3xl font-bold text-red-600">
-                {riskStats.high}
-              </div>
+
+            {/* High */}
+            <div className="text-center p-4 border rounded-lg bg-red-50 border-red-200 hover:bg-red-100 transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold text-red-700">{riskStats.high}</div>
               <div className="text-sm text-muted-foreground">High Risk</div>
               <div className="text-xs text-muted-foreground mt-1">
-                {totalAssessments > 0 ? `${((riskStats.high / totalAssessments) * 100).toFixed(1)}%` : '0%'}
+                {totalAssessments > 0 ? `${((riskStats.high / totalAssessments) * 100).toFixed(1)}%` : "0%"}
               </div>
             </div>
           </div>
-          
+
           <div className="mt-4 p-3 bg-muted/30 rounded-lg">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">Total Assessments</span>
@@ -183,47 +177,58 @@ export function OverviewTab() {
             </div>
           ) : (
             <div className="space-y-3">
-              {recentReports.map((report) => (
-                <div key={report.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <div className="font-medium">Report #{report.id}</div>
-                      <Badge 
-                        variant={
-                          report.risk_level.toLowerCase() === 'safe' ? 'outline' :
-                          report.risk_level.toLowerCase() === 'low' ? 'default' :
-                          report.risk_level.toLowerCase() === 'moderate' ? 'secondary' : 'destructive'
-                        }
-                      >
-                        {report.risk_level === 'safe' ? 'Safe' : `${report.risk_level} Risk`}
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      <span className="flex items-center gap-2">
-                        <Users className="h-3 w-3" />
-                        {report.childName || `Child #${report.child_id}`} • 
-                        {format(parseISO(report.created_at), 'MMM dd, yyyy HH:mm')}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right text-sm">
-                      <div className="font-medium">{report.predicted_class}</div>
-                      <div className="text-muted-foreground">
-                        {(report.confidence * 100).toFixed(1)}% confidence
+              {recentReports.map((report) => {
+                const risk = report.risk_level.toLowerCase();
+                const colorMap: Record<string, string> = {
+                  safe: "bg-emerald-50 text-green-700 border-green-200",
+                  low: "bg-cyan-100 text-cyan-700 border-cyan-200",
+                  moderate: "bg-yellow-100 text-yellow-700 border-yellow-200",
+                  high: "bg-red-100 text-red-700 border-red-200"
+                };
+
+                return (
+                  <div
+                    key={report.id}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-all duration-300 shadow-sm hover:shadow-md"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <div className="font-medium">Report #{report.id}</div>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-md border ${
+                            colorMap[risk] || "bg-gray-100 text-gray-700 border-gray-200"
+                          }`}
+                        >
+                          {risk === "safe" ? "Safe" : `${report.risk_level} Risk`}
+                        </span>
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        <span className="flex items-center gap-2">
+                          <Users className="h-3 w-3" />
+                          {report.childName || `Child #${report.child_id}`} •{" "}
+                          {format(parseISO(report.created_at), "MMM dd, yyyy HH:mm")}
+                        </span>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewResult(report)}
-                      title="View detailed results"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right text-sm">
+                        <div className="font-medium">{report.predicted_class}</div>
+                        <div className="text-muted-foreground">
+                          {(report.confidence * 100).toFixed(1)}% confidence
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewResult(report)}
+                        title="View detailed results"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>

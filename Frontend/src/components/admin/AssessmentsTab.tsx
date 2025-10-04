@@ -394,7 +394,20 @@ export function AssessmentsTab() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                           <Badge variant={report.risk_level.toLowerCase() === 'high' ? 'destructive' : 'secondary'} className="capitalize">{report.risk_level} Risk</Badge>
+                                        {(() => {
+                                            const risk = report.risk_level.toLowerCase();
+                                            let badgeStyle = "bg-gray-100 text-gray-700 border border-gray-300";
+                                            if (risk === "safe") badgeStyle = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+                                            else if (risk === "low") badgeStyle = "bg-cyan-50 text-cyan-700 border border-cyan-200";
+                                            else if (risk === "moderate") badgeStyle = "bg-amber-50 text-amber-700 border border-amber-200";
+                                            else if (risk === "high") badgeStyle = "bg-red-50 text-red-700 border border-red-200";
+
+                                            return (
+                                                <Badge className={`capitalize ${badgeStyle}`}>
+                                                {report.risk_level} Risk
+                                                </Badge>
+                                            );
+                                            })()}
                                            <Button variant="ghost" size="icon" onClick={() => handleViewResult(report)}><Eye className="h-4 w-4" /></Button>
                                         </div>
                                       </div>

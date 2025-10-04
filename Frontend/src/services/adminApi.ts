@@ -113,7 +113,7 @@ class AdminApi {
       // Determine system health based on data
       let systemHealth: 'excellent' | 'good' | 'warning' | 'critical' = 'excellent';
       if (highRiskCount > totalAssessments * 0.3) systemHealth = 'critical';
-      else if (highRiskCount > totalAssessments * 0.2) systemHealth = 'warning';
+      // else if (highRiskCount > totalAssessments * 0.2) systemHealth = 'warning';
       else if (totalAssessments > 0) systemHealth = 'good';
 
       return {

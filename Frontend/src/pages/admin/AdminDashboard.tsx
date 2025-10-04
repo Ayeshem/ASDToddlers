@@ -812,14 +812,14 @@ Generated at: ${new Date().toISOString()}
             ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {/* Total Children */}
-              <Card className="bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors rounded-2xl shadow-sm">
+              <Card className="bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors rounded-2xl shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-semibold text-blue-900">Total Children</CardTitle>
-                  <Users className="h-5 w-5 text-blue-600" />
+                  <CardTitle className="text-sm font-semibold text-purple-900">Total Children</CardTitle>
+                  <Users className="h-5 w-5 text-purple-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-700">{systemStats.totalChildren}</div>
-                  <p className="text-xs text-blue-800/70 mt-1">Registered patients</p>
+                  <div className="text-3xl font-bold text-purple-700">{systemStats.totalChildren}</div>
+                  <p className="text-xs text-purple-800/70 mt-1">Registered patients</p>
                 </CardContent>
               </Card>
 
@@ -878,14 +878,14 @@ Generated at: ${new Date().toISOString()}
               </Card>
 
               {/* Stimuli Library */}
-              <Card className="bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors rounded-2xl shadow-sm">
+              <Card className="bg-stone-100 border border-stone-200 hover:bg-stone-200 transition-colors rounded-2xl shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-semibold text-purple-900">Stimuli Library</CardTitle>
-                  <Video className="h-5 w-5 text-purple-600" />
+                  <CardTitle className="text-sm font-semibold text-stone-900">Stimuli Library</CardTitle>
+                  <Video className="h-5 w-5 text-stone-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-purple-700">{systemStats.totalStimuli}</div>
-                  <p className="text-xs text-purple-800/70 mt-1">Video stimuli available</p>
+                  <div className="text-3xl font-bold text-stone-700">{systemStats.totalStimuli}</div>
+                  <p className="text-xs text-stone-800/70 mt-1">Video stimuli available</p>
                 </CardContent>
               </Card>
             </div>
