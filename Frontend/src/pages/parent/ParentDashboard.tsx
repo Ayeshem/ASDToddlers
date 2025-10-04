@@ -100,6 +100,10 @@ export default function ParentDashboard() {
   const handleViewReports = (child: Child) => {
     navigate(`/reports/${child.id}`);
   };
+  //make a page of that componnet, add routes to that page, add page in parentcard.
+  const handleViewHistory = (child: Child) => {
+    navigate(`/history/${child.id}`);
+  };
 
   const handleRefreshChildren = () => {
     if (user?.id) {
@@ -159,6 +163,8 @@ export default function ParentDashboard() {
             onDelete={handleDeleteChild}
             onStartSession={handleStartSession}
             onViewReports={handleViewReports}
+            // --- NEW PROP PASSED TO CHILD CARD ---
+            onViewHistory={handleViewHistory}
           />
         ))}
       </div>

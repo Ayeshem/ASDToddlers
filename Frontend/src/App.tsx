@@ -24,6 +24,7 @@ import GazeSession from "./pages/session/GazeSession";
 import AppointmentScheduler from "./pages/appointments/AppointmentScheduler";
 import ViewAppointment from "./pages/appointments/ViewAppointment";
 import UserGuidePage from "./pages/userguide/UserGuidePage";
+import ChildHistoryPage from "./pages/reports/AssessmentHistory";
 
 
 import { AssessmentsTab } from "./components/admin/AssessmentsTab";
@@ -126,6 +127,14 @@ function AppRoutes() {
         }
       />
 
+      <Route
+        path="/history/:childId"
+        element={
+          <ProtectedRoute allowedRoles={['parent']}>
+            <ChildHistoryPage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/doctor-dashboard"
@@ -162,7 +171,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      {/* Parametrized report route used by GazeSession navigation */}
+
       <Route
         path="/reports/:childId"
         element={
