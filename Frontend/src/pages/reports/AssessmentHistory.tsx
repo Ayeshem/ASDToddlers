@@ -157,15 +157,16 @@ export default function ChildHistoryPage() {
   // Function to determine badge color based on prediction class
   const getPredictionBadgeClass = (prediction: string) => {
     const lowerPrediction = prediction.toLowerCase();
-    if (lowerPrediction.includes('asd')) {
-      return 'bg-red-600 hover:bg-red-700 text-white'; // Red for ASD
-    }
+    
     if (lowerPrediction.includes('non-asd')) {
       return 'bg-green-600 hover:bg-green-700 text-white'; // Green for Non-ASD
     }
-    return 'bg-gray-500 hover:bg-gray-600 text-white'; // Default neutral color
-  }
-
+    if (lowerPrediction.includes('asd')) {
+      return 'bg-red-600 hover:bg-red-700 text-white'; // Red for ASD
+    }
+    return 'bg-gray-500 hover:bg-gray-600 text-white';
+  };
+  
   const handleDownloadReport = (report: Report) => {
     const blob = new Blob([JSON.stringify(report, null, 2)], {
       type: "application/json",
