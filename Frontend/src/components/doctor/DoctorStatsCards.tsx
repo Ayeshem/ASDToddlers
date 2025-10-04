@@ -106,80 +106,91 @@ export function DoctorStatsCards() {
     );
   }
 
-
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      {/* Total Patients - Purple */}
-      <Card className="bg-purple-50 border border-purple-100 hover:bg-purple-100/50 transition-all rounded-xl shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-purple-700">Total Patients</CardTitle>
-          <Users className="h-4 w-4 text-purple-600" />
+      {/* Total Patients */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
+          <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-purple-700">{stats.totalPatients}</div>
-          <p className="text-xs text-purple-600/70">Active patient profiles</p>
+          <div className="text-2xl font-bold">{stats.totalPatients}</div>
+          <p className="text-xs text-muted-foreground">
+            Active patient profiles
+          </p>
         </CardContent>
       </Card>
-  
-      {/* Total Assessments - Blue */}
-      <Card className="bg-blue-50 border border-blue-100 hover:bg-blue-100/50 transition-all rounded-xl shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-blue-700">Total Assessments</CardTitle>
-          <Activity className="h-4 w-4 text-blue-600" />
+
+      {/* Total Assessments */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Assessments</CardTitle>
+          <Activity className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-blue-700">{totalAssessments}</div>
-          <p className="text-xs text-blue-600/70">Completed evaluations</p>
+          <div className="text-2xl font-bold">{totalAssessments}</div>
+          <p className="text-xs text-muted-foreground">
+            Completed evaluations
+          </p>
         </CardContent>
       </Card>
-  
-      {/* High Risk Cases - Red */}
-      <Card className="bg-red-50 border border-red-100 hover:bg-red-100/50 transition-all rounded-xl shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-red-700">High Risk Cases</CardTitle>
+
+      {/* High Risk Cases */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">High Risk Cases</CardTitle>
           <TrendingUp className="h-4 w-4 text-red-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-red-700">{stats.highRiskCount}</div>
-          <p className="text-xs text-red-600/70">Require immediate attention</p>
+          <div className="text-2xl font-bold text-red-600">{stats.highRiskCount}</div>
+          <p className="text-xs text-muted-foreground">
+            Require immediate attention
+          </p>
         </CardContent>
       </Card>
-  
-        {/* Moderate Risk Cases - Light Yellow */}
-        <Card className="bg-yellow-50 border border-yellow-100 hover:bg-yellow-100/60 transition-all rounded-xl shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-yellow-700">Moderate Risk Cases</CardTitle>
-            <Target className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-700">{stats.moderateRiskCount}</div>
-            <p className="text-xs text-yellow-600/70">Monitoring recommended</p>
-          </CardContent>
-        </Card>
 
-      {/* Low Risk Cases - Cyan */}
-      <Card className="bg-cyan-50 border border-cyan-100 hover:bg-cyan-100/50 transition-all rounded-xl shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-cyan-700">Low Risk Cases</CardTitle>
-          <Shield className="h-4 w-4 text-cyan-600" />
+      {/* Moderate Risk Cases */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Moderate Risk Cases</CardTitle>
+          <Target className="h-4 w-4 text-yellow-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-cyan-700">{stats.lowRiskCount}</div>
-          <p className="text-xs text-cyan-600/70">Healthy development</p>
+          <div className="text-2xl font-bold text-yellow-600">{stats.moderateRiskCount}</div>
+          <p className="text-xs text-muted-foreground">
+            Monitoring recommended
+          </p>
         </CardContent>
       </Card>
-  
-      {/* Safe Cases - Green */}
-      <Card className="bg-green-50 border border-green-100 hover:bg-green-100/50 transition-all rounded-xl shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-green-700">Safe Cases</CardTitle>
-          <CheckCircle className="h-4 w-4 text-green-600" />
+
+      {/* Low Risk Cases */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Low Risk Cases</CardTitle>
+          <Shield className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-700">{stats.safeRiskCount}</div>
-          <p className="text-xs text-green-600/70">No concerns detected</p>
+          <div className="text-2xl font-bold text-green-600">{stats.lowRiskCount}</div>
+          <p className="text-xs text-muted-foreground">
+            Healthy development
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Safe Cases */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Safe Cases</CardTitle>
+          <CheckCircle className="h-4 w-4 text-emerald-600" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-emerald-600">{stats.safeRiskCount}</div>
+          <p className="text-xs text-muted-foreground">
+            No concerns detected
+          </p>
         </CardContent>
       </Card>
     </div>
   );
-}  
+}
