@@ -1,342 +1,3 @@
-// import { useState, useEffect, useCallback, useMemo } from "react";
-// import { DashboardLayout } from "@/components/layout/dashboard-layout";
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Badge } from "@/components/ui/badge";
-// import { LoadingSpinner } from "@/components/ui/loading-spinner";
-// import { useToast } from "@/hooks/use-toast";
-// import { adminApi, type StimuliVideo } from "@/services/adminApi";
-// import {
-//   Video, RefreshCw, Eye, AlertTriangle, PlusCircle, MoreHorizontal,
-//   LayoutGrid, List, Search, X, Pencil, Trash2
-// } from "lucide-react";
-
-// // New imports for the enhanced UI
-// import { Input } from "@/components/ui/input";
-// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-
-// //==========================================================================
-// // 1. Main Page Component (Renamed for clarity)
-// //==========================================================================
-// export function StimuliManagementTab() {
-//   const [stimuli, setStimuli] = useState<StimuliVideo[]>([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-//   const { toast } = useToast();
-
-//   // UI State
-//   const [layout, setLayout] = useState<'grid' | 'table'>('grid');
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [categoryFilter, setCategoryFilter] = useState("all");
-//   const [activeVideo, setActiveVideo] = useState<StimuliVideo | null>(null);
-
-//   const fetchStimuli = useCallback(async () => {
-//     setIsLoading(true);
-//     setError(null);
-//     try {
-//       const stimuliData = await adminApi.getAllStimuli();
-//       setStimuli(stimuliData);
-//     } catch (error) {
-//       console.error('Failed to fetch stimuli:', error);
-//       const errorMessage = "Failed to load stimuli data. Please try again.";
-//       setError(errorMessage);
-//       toast({ title: "Error", description: errorMessage, variant: "destructive" });
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   }, [toast]);
-
-//   useEffect(() => {
-//     fetchStimuli();
-//   }, [fetchStimuli]);
-
-//   const uniqueCategories = useMemo(() => ["all", ...new Set(stimuli.map(s => s.category))], [stimuli]);
-
-//   const filteredStimuli = useMemo(() => {
-//     return stimuli
-//       .filter(s => categoryFilter === 'all' || s.category === categoryFilter)
-//       .filter(s => s.title.toLowerCase().includes(searchTerm.toLowerCase()));
-//   }, [stimuli, searchTerm, categoryFilter]);
-
-//   // Placeholder actions
-//   const handleAddNew = () => toast({ title: "Action", description: "Open 'Add New Stimulus' form/modal." });
-//   const handleEdit = (id: string) => toast({ title: "Action", description: `Editing stimulus ID: ${id}` });
-//   const handleDelete = (id: string) => toast({ title: "Action", description: `Deleting stimulus ID: ${id}`, variant: "destructive" });
-
-//   const renderContent = () => {
-//     if (isLoading) return <div className="flex justify-center py-20"><LoadingSpinner size="lg" text="Loading stimuli..." /></div>;
-//     if (error) return <ErrorState message={error} onRetry={fetchStimuli} />;
-    
-//     if (stimuli.length === 0) {
-//       return <EmptyState onAddNew={handleAddNew} />;
-//     }
-
-//     return (
-//       <Card>
-//         <CardHeader>
-//           <CardTitle>Stimuli Library</CardTitle>
-//           <CardDescription>
-//               Browse, search, and manage all available video stimuli.
-//           </CardDescription>
-//           <div className="flex flex-wrap items-center gap-4 mt-4">
-//               <div className="relative flex-1 min-w-[250px]">
-//                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-//                   <Input placeholder="Search by title..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-9" />
-//               </div>
-//               <div className="flex flex-wrap items-center gap-2 ml-auto">
-//                   <Button variant="outline" onClick={fetchStimuli} disabled={isLoading}>
-//                       <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />   
-//                   </Button>
-//                   <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-//                       <SelectTrigger className="w-[180px]">
-//                           <SelectValue placeholder="Filter by category" />
-//                       </SelectTrigger>
-//                       <SelectContent>
-//                           {uniqueCategories.map(cat => <SelectItem key={cat} value={cat}>{cat === 'all' ? 'All Categories' : cat}</SelectItem>)}
-//                       </SelectContent>
-//                   </Select>
-//                   <Button variant={layout === 'grid' ? 'secondary' : 'outline'} size="icon" onClick={() => setLayout('grid')}><LayoutGrid className="h-4 w-4" /></Button>
-//                   <Button variant={layout === 'table' ? 'secondary' : 'outline'} size="icon" onClick={() => setLayout('table')}><List className="h-4 w-4" /></Button>
-//               </div>
-//           </div>
-//         </CardHeader>
-//         <CardContent>
-//             {filteredStimuli.length === 0 ? (
-//                 <p className="text-center text-muted-foreground py-8">No stimuli match your current filters.</p>
-//             ) : layout === 'grid' ? (
-//                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-//                     {filteredStimuli.map((stimulus) => (
-//                         <StimulusCard
-//                             key={stimulus.id}
-//                             stimulus={stimulus}
-//                             onView={setActiveVideo}
-//                             onEdit={handleEdit}
-//                             onDelete={handleDelete}
-//                         />
-//                     ))}
-//                 </div>
-//             ) : (
-//                 <StimulusTable
-//                     stimuli={filteredStimuli}
-//                     onView={setActiveVideo}
-//                     onEdit={handleEdit}
-//                     onDelete={handleDelete}
-//                 />
-//             )}
-//         </CardContent>
-//       </Card>
-//     );
-//   };
-
-//   return (
-//     <DashboardLayout>
-//       <div className="space-y-6">
-//         <StimuliStatistics stimuli={stimuli} />
-//         {renderContent()}
-//         <VideoPreviewModal video={activeVideo} onOpenChange={(isOpen) => !isOpen && setActiveVideo(null)} />
-//       </div>
-//     </DashboardLayout>
-//   );
-// }
-
-
-// //==========================================================================
-// // 2. Helper Components
-// //==========================================================================
-
-// function StimulusCard({
-//   stimulus, onView, onEdit, onDelete
-// }: {
-//   stimulus: StimuliVideo;
-//   onView: (stimulus: StimuliVideo) => void;
-//   onEdit: (id: string) => void;
-//   onDelete: (id: string) => void;
-// }) {
-//   return (
-//     <Card className="flex flex-col group transition-all hover:shadow-xl hover:-translate-y-1">
-//       <CardHeader>
-//         <div className="flex justify-between items-start">
-//           <CardTitle className="truncate pr-2">{stimulus.title}</CardTitle>
-//           {/* <StimulusActions id={stimulus.id} onEdit={onEdit} onDelete={onDelete} /> */}
-//         </div>
-//         <CardDescription className="line-clamp-2 h-[40px]">
-//           {stimulus.description || "No description provided."}
-//         </CardDescription>
-//       </CardHeader>
-//       <CardContent className="flex-grow space-y-2">
-//         <div className="flex items-center justify-between text-sm text-muted-foreground">
-//           <Badge variant="secondary">{stimulus.category}</Badge>
-//           {stimulus.duration && <span>{Math.round(stimulus.duration)}s</span>}
-//         </div>
-//       </CardContent>
-//       <CardFooter>
-//         <Button variant="outline" size="sm" onClick={() => onView(stimulus)} className="w-full">
-//           <Eye className="h-4 w-4 mr-2" /> View Video
-//         </Button>
-//       </CardFooter>
-//     </Card>
-//   );
-// }
-
-// // NEW: Table view for stimuli
-// function StimulusTable({
-//   stimuli, onView, onEdit, onDelete
-// }: {
-//   stimuli: StimuliVideo[];
-//   onView: (stimulus: StimuliVideo) => void;
-//   onEdit: (id: string) => void;
-//   onDelete: (id: string) => void;
-// }) {
-//     return (
-//         <Table>
-//             <TableHeader>
-//                 <TableRow>
-//                     <TableHead>Title</TableHead>
-//                     <TableHead>Category</TableHead>
-//                     <TableHead className="text-right">Duration (s)</TableHead>
-//                     <TableHead className="text-right">Actions</TableHead>
-//                 </TableRow>
-//             </TableHeader>
-//             <TableBody>
-//                 {stimuli.map((s) => (
-//                     <TableRow key={s.id}>
-//                         <TableCell className="font-medium">{s.title}</TableCell>
-//                         <TableCell><Badge variant="secondary">{s.category}</Badge></TableCell>
-//                         <TableCell className="text-right">{s.duration ? Math.round(s.duration) : 'N/A'}</TableCell>
-//                         <TableCell className="text-right">
-//                              <Button variant="ghost" size="sm" onClick={() => onView(s)}><Eye className="h-4 w-4 mr-2" /> View</Button>
-//                              {/* <StimulusActions id={s.id} onEdit={onEdit} onDelete={onDelete} /> */}
-//                         </TableCell>
-//                     </TableRow>
-//                 ))}
-//             </TableBody>
-//         </Table>
-//     );
-// }
-
-// // // NEW: Reusable actions dropdown
-// // function StimulusActions({ id, onEdit, onDelete }: { id: string, onEdit: (id: string) => void, onDelete: (id: string) => void }) {
-// //   return (
-// //     <DropdownMenu>
-// //       <DropdownMenuTrigger asChild>
-// //         <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
-// //       </DropdownMenuTrigger>
-// //       <DropdownMenuContent>
-// //         <DropdownMenuItem onClick={() => onEdit(id)}><Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
-// //         <DropdownMenuItem onClick={() => onDelete(id)} className="text-red-500"><Trash2 className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
-// //       </DropdownMenuContent>
-// //     </DropdownMenu>
-// //   );
-// // }
-
-// // NEW: Modal for video preview
-// function VideoPreviewModal({ video, onOpenChange }: { video: StimuliVideo | null, onOpenChange: (isOpen: boolean) => void }) {
-//   if (!video) return null;
-//   return (
-//     <Dialog open={!!video} onOpenChange={onOpenChange}>
-//       <DialogContent className="max-w-4xl">
-//         <DialogHeader><DialogTitle>{video.title}</DialogTitle></DialogHeader>
-//         <div className="aspect-video bg-black rounded-md">
-//             <video src={video.video_url} controls autoPlay className="w-full h-full" />
-//         </div>
-//         <DialogFooter><DialogClose asChild><Button type="button" variant="secondary">Close</Button></DialogClose></DialogFooter>
-//       </DialogContent>
-//     </Dialog>
-//   );
-// }
-
-// function ErrorState({ message, onRetry }: { message: string, onRetry: () => void }) {
-//   return (
-//     <div className="text-center py-12">
-//       <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500" />
-//       <p className="mt-4 text-red-500">{message}</p>
-//       <Button variant="outline" onClick={onRetry} className="mt-4">
-//         <RefreshCw className="mr-2 h-4 w-4" /> Try Again
-//       </Button>
-//     </div>
-//   );
-// }
-
-// function EmptyState({ onAddNew }: { onAddNew: () => void }) {
-//   return (
-//     <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-//       <Video className="mx-auto h-12 w-12 text-muted-foreground" />
-//       <h3 className="mt-4 text-lg font-medium">Your Library is Empty</h3>
-//       <p className="mt-1 text-sm text-muted-foreground">Get started by adding your first stimulus video.</p>
-//       <Button onClick={onAddNew} className="mt-6"><PlusCircle className="mr-2 h-4 w-4" /> Add First Video</Button>
-//     </div>
-//   );
-// }
-
-// function StimuliStatistics({ stimuli }: { stimuli: StimuliVideo[] }) {
-//   const categoryCounts = useMemo(() => {
-//     return stimuli.reduce((acc, s) => {
-//       acc[s.category] = (acc[s.category] || 0) + 1;
-//       return acc;
-//     }, {} as Record<string, number>);
-//   }, [stimuli]);
-
-//   // Convert total duration (seconds) → hours + minutes
-//   const totalDurationDisplay = useMemo(() => {
-//     const totalSeconds = stimuli.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
-//     const hours = Math.floor(totalSeconds / 3600);
-//     const minutes = Math.floor((totalSeconds % 3600) / 60);
-
-//     if (hours === 0 && minutes === 0) return "0 minutes";
-//     if (hours === 0) return `${minutes} minutes`;
-//     if (minutes === 0) return `${hours} hours`;
-//     return `${hours} hours ${minutes} minutes`;
-//   }, [stimuli]);
-
-//   return (
-//     <div className="grid gap-4 md:grid-cols-3">
-//       {/* Total Videos */}
-//       <Card className="bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors rounded-2xl shadow-sm">
-//         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//           <CardTitle className="text-sm font-semibold text-blue-900">Total Videos</CardTitle>
-//           <Video className="h-5 w-5 text-blue-600" />
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-3xl font-bold text-blue-700">{stimuli.length}</div>
-//           <p className="text-xs text-blue-800/70 mt-1">Videos in the library</p>
-//         </CardContent>
-//       </Card>
-
-//       {/* Unique Categories */}
-//       <Card className="bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors rounded-2xl shadow-sm">
-//         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//           <CardTitle className="text-sm font-semibold text-emerald-900">Unique Categories</CardTitle>
-//           <LayoutGrid className="h-5 w-5 text-emerald-600" />
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-3xl font-bold text-emerald-700">
-//             {Object.keys(categoryCounts).length}
-//           </div>
-//           <p className="text-xs text-emerald-800/70 mt-1">Different types of stimuli</p>
-//         </CardContent>
-//       </Card>
-
-//       {/* Total Duration */}
-//       <Card className="bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors rounded-2xl shadow-sm">
-//         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//           <CardTitle className="text-sm font-semibold text-purple-900">
-//             Total Duration
-//           </CardTitle>
-//           <List className="h-5 w-5 text-purple-600" />
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-3xl font-bold text-purple-700">{totalDurationDisplay}</div>
-//           <p className="text-xs text-purple-800/70 mt-1">Combined video length</p>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// }
-
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -668,25 +329,25 @@ function StimuliStatistics({ stimuli }: { stimuli: StimuliVideo[] }) {
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {/* Total Videos */}
-      <Card className="bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors rounded-2xl shadow-sm">
+      <Card className="transition-colors rounded-2xl shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-semibold text-blue-900">Total Videos</CardTitle>
-          <Video className="h-5 w-5 text-blue-600" />
+          <CardTitle className="text-sm font-semibold">Total Videos</CardTitle>
+          <Video className="h-5 w-5" />
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-blue-700">{stimuli.length}</div>
-          <p className="text-xs text-blue-800/70 mt-1">Videos in the library</p>
+          <div className="text-3xl font-bold">{stimuli.length}</div>
+          <p className="text-xs mt-1">Videos in the library</p>
         </CardContent>
       </Card>
 
       {/* Unique Categories */}
-      <Card className="bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors rounded-2xl shadow-sm">
+      <Card className="transition-colors rounded-2xl shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-semibold text-emerald-900">Unique Categories</CardTitle>
-          <LayoutGrid className="h-5 w-5 text-emerald-600" />
+          <CardTitle className="text-sm font-semibold">Unique Categories</CardTitle>
+          <LayoutGrid className="h-5 w-5" />
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-emerald-700">
+          <div className="text-3xl font-bold">
             {Object.keys(categoryCounts).length}
           </div>
           <p className="text-xs text-emerald-800/70 mt-1">Different types of stimuli</p>
@@ -694,16 +355,16 @@ function StimuliStatistics({ stimuli }: { stimuli: StimuliVideo[] }) {
       </Card>
 
       {/* Total Duration */}
-      <Card className="bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors rounded-2xl shadow-sm">
+      <Card className="transition-colors rounded-2xl shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-semibold text-purple-900">
+          <CardTitle className="text-sm font-semibold">
             Total Duration
           </CardTitle>
-          <List className="h-5 w-5 text-purple-600" />
+          <List className="h-5 w-5" />
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-purple-700">{totalDurationDisplay}</div>
-          <p className="text-xs text-purple-800/70 mt-1">Combined video length</p>
+          <div className="text-3xl font-bold">{totalDurationDisplay}</div>
+          <p className="text-xs mt-1">Combined video length</p>
         </CardContent>
       </Card>
     </div>

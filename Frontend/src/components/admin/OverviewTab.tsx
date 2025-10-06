@@ -115,8 +115,8 @@ export function OverviewTab() {
         <CardContent>
           <div className="grid grid-cols-4 gap-4">
             {/* Safe */}
-            <div className="text-center p-4 border rounded-lg bg-green-50 border-green-200 hover:bg-green-100 transition-all duration-300 shadow-sm hover:shadow-md">
-              <div className="text-3xl font-bold text-emerald-700">{riskStats.safe}</div>
+            <div className="text-center p-4 border rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold">{riskStats.safe}</div>
               <div className="text-sm text-muted-foreground">Safe</div>
               <div className="text-xs text-muted-foreground mt-1">
                 {totalAssessments > 0 ? `${((riskStats.safe / totalAssessments) * 100).toFixed(1)}%` : "0%"}
@@ -124,8 +124,8 @@ export function OverviewTab() {
             </div>
 
             {/* Low */}
-            <div className="text-center p-4 border rounded-lg bg-cyan-50 border-cyan-200 hover:bg-cyan-100 transition-all duration-300 shadow-sm hover:shadow-md">
-              <div className="text-3xl font-bold text-cyan-700">{riskStats.low}</div>
+            <div className="text-center p-4 border rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold">{riskStats.low}</div>
               <div className="text-sm text-muted-foreground">Low Risk</div>
               <div className="text-xs text-muted-foreground mt-1">
                 {totalAssessments > 0 ? `${((riskStats.low / totalAssessments) * 100).toFixed(1)}%` : "0%"}
@@ -133,8 +133,8 @@ export function OverviewTab() {
             </div>
 
             {/* Moderate */}
-            <div className="text-center p-4 border rounded-lg bg-yellow-50 border-yellow-200 hover:bg-yellow-100 transition-all duration-300 shadow-sm hover:shadow-md">
-              <div className="text-3xl font-bold text-yellow-700">{riskStats.moderate}</div>
+            <div className="text-center p-4 border rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold ">{riskStats.moderate}</div>
               <div className="text-sm text-muted-foreground">Moderate Risk</div>
               <div className="text-xs text-muted-foreground mt-1">
                 {totalAssessments > 0 ? `${((riskStats.moderate / totalAssessments) * 100).toFixed(1)}%` : "0%"}
@@ -142,8 +142,8 @@ export function OverviewTab() {
             </div>
 
             {/* High */}
-            <div className="text-center p-4 border rounded-lg bg-red-50 border-red-200 hover:bg-red-100 transition-all duration-300 shadow-sm hover:shadow-md">
-              <div className="text-3xl font-bold text-red-700">{riskStats.high}</div>
+            <div className="text-center p-4 border rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">
+              <div className="text-3xl font-bold">{riskStats.high}</div>
               <div className="text-sm text-muted-foreground">High Risk</div>
               <div className="text-xs text-muted-foreground mt-1">
                 {totalAssessments > 0 ? `${((riskStats.high / totalAssessments) * 100).toFixed(1)}%` : "0%"}
