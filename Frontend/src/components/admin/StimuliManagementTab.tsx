@@ -101,10 +101,10 @@ export function StimuliManagementTab() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Stimuli Library</CardTitle>
+          {/* <CardTitle>Stimuli Library</CardTitle>
           <CardDescription>
               Browse, search, and manage all available video stimuli.
-          </CardDescription>
+          </CardDescription> */}
           <div className="flex flex-wrap items-center gap-4 mt-4">
               <div className="relative flex-1 min-w-[250px]">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
